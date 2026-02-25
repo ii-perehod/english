@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unit IV — Словарный квиз</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+    min-height: 100vh; color: #e0e0e0;
+    display: flex; align-items: center; justify-content: center; padding: 20px;
+}
+.page { max-width: 460px; width: 100%; }
+h1 { text-align: center; font-size: 1.5em; margin-bottom: 4px;
+     background: linear-gradient(90deg, #00d2ff, #7b2ff7);
+     -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.sub { text-align: center; color: #666; font-size: 0.82em; margin-bottom: 28px; }
+.btn { display: block; width: 100%; padding: 16px 20px; border: none; border-radius: 12px;
+       font-size: 1em; font-weight: 600; cursor: pointer; transition: all 0.2s; margin-bottom: 12px; }
+.btn-a { background: rgba(0,210,255,0.08); border: 1px solid rgba(0,210,255,0.4); color: #00d2ff; }
+.btn-a:hover { background: rgba(0,210,255,0.18); transform: translateY(-2px); }
+.btn-b { background: rgba(123,47,247,0.08); border: 1px solid rgba(123,47,247,0.4); color: #b388ff; }
+.btn-b:hover { background: rgba(123,47,247,0.18); transform: translateY(-2px); }
+.progress { font-size: 0.78em; color: #666; text-align: center; margin-bottom: 14px; }
+.card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 14px; padding: 28px 24px; text-align: center; margin-bottom: 20px; }
+.en { font-size: 1.9em; font-weight: 700; color: #00d2ff; margin-bottom: 6px; }
+.label { font-size: 0.78em; color: #666; margin-bottom: 8px; }
+.speak { background: none; border: 1px solid rgba(0,210,255,0.3); color: rgba(0,210,255,0.6);
+         padding: 4px 12px; border-radius: 6px; cursor: pointer; font-size: 0.78em; }
+.speak:hover { color: #00d2ff; border-color: #00d2ff; }
+.opts { display: flex; flex-direction: column; gap: 9px; }
+.opt { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1);
+       border-radius: 8px; padding: 14px 18px; cursor: pointer; font-size: 0.93em;
+       transition: all 0.15s; text-align: left; color: #ddd; }
+.opt:hover { background: rgba(0,210,255,0.07); border-color: rgba(0,210,255,0.3); }
+.opt.ok { background: rgba(0,200,100,0.15); border-color: #00c864; color: #00ff88; pointer-events: none; }
+.opt.bad { background: rgba(200,50,50,0.15); border-color: #cc4444; color: #ff7070; pointer-events: none; }
+.result { text-align: center; padding: 20px 0; }
+.score { font-size: 3em; font-weight: 700; color: #00d2ff; margin-bottom: 6px; }
+.msg { font-size: 0.88em; color: #888; margin-bottom: 24px; }
+</style>
+</head>
+<body>
+<div class="page">
+    <h1>Unit IV · Словарный квиз</h1>
+    <p class="sub">Лесные ресурсы · Forest Resources Management</p>
+
+    <div id="start">
+        <button class="btn btn-a" onclick="go('sheet')">📝 Слова с листика &nbsp;<small style="opacity:.6">(10 слов)</small></button>
+        <button class="btn btn-b" onclick="go('book')">📚 Слова из книги Unit 4 &nbsp;<small style="opacity:.6">(24 слова)</small></button>
+        <button class="btn" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.1);color:#888;font-size:.85em" onclick="window.location='index.html'">← Назад</button>
+    </div>
+
+    <div id="quiz" style="display:none">
+        <div class="progress" id="prog"></div>
+        <div class="card">
+            <div class="en" id="en"></div>
+            <div class="label">Выбери перевод:</div>
+            <button class="speak" onclick="say()">🔊 Прослушать</button>
+        </div>
+        <div class="opts" id="opts"></div>
+    </div>
+
+    <div id="res" style="display:none">
+        <div class="result">
+            <div class="score" id="sc"></div>
+            <div class="msg" id="msg"></div>
+            <button class="btn btn-a" onclick="retry()">Пройти ещё раз</button>
+            <button class="btn btn-b" onclick="go('book')" id="btn-other" style="display:none"></button>
+            <button class="btn" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.1);color:#888" onclick="window.location='index.html'">← На главную</button>
+        </div>
+    </div>
+</div>
+<script>
+const sets = {
+    sheet: [
+        {en:'moisture', ru:'влажность'},
+        {en:'annihilation', ru:'уничтожение'},
+        {en:'restoration', ru:'восстановление'},
+        {en:'deforestation', ru:'вырубка лесов'},
+        {en:'reforestation', ru:'восстановление лесов'},
+        {en:'arable lands', ru:'пахотные земли'},
+        {en:'diverse', ru:'разный, различный'},
+        {en:'acid rain', ru:'кислотный дождь'},
+        {en:'result in', ru:'приводить к'},
+        {en:'participation', ru:'участие'},
+    ],
+    book: [
+        {en:'ax', ru:'топор'},
+        {en:'remote', ru:'удалённый'},
+        {en:'yield', ru:'давать урожай, производить'},
+        {en:'cattle-breeding', ru:'скотоводство'},
+        {en:'copse', ru:'подлесок'},
+        {en:'decrease', ru:'уменьшаться, сокращаться'},
+        {en:'lungs', ru:'лёгкие'},
+        {en:'boreal', ru:'северный (бореальный)'},
+        {en:'temperate', ru:'умеренный климат'},
+        {en:'forestry', ru:'лесоводство'},
+        {en:'pine', ru:'сосна'},
+        {en:'birch', ru:'берёза'},
+        {en:'fir', ru:'пихта'},
+        {en:'forbid', ru:'запрещать'},
+        {en:'afforestation', ru:'лесонасаждение'},
+        {en:'global warming', ru:'глобальное потепление'},
+        {en:'blaze', ru:'пламя, огонь'},
+        {en:'coincide with', ru:'совпадать с'},
+        {en:'evidence', ru:'доказательство'},
+        {en:'sustainable', ru:'устойчивый'},
+        {en:'adverse effect', ru:'неблагоприятное воздействие'},
+        {en:'mass extinction', ru:'массовое вымирание'},
+        {en:'population growth', ru:'рост населения'},
+        {en:'irreversible loss', ru:'невозвратимая потеря'},
+    ]
+};
+
+let cur = 0, score = 0, qs = [], pool = [], answered = false, activeSet = '';
+
+function shuffle(a){ return [...a].sort(()=>Math.random()-.5); }
+
+function go(name){
+    activeSet = name;
+    pool = [...sets.sheet, ...sets.book];
+    qs = shuffle(sets[name]);
+    cur = 0; score = 0;
+    document.getElementById('start').style.display = 'none';
+    document.getElementById('res').style.display = 'none';
+    document.getElementById('quiz').style.display = 'block';
+    show();
+}
+
+function show(){
+    answered = false;
+    const q = qs[cur];
+    document.getElementById('prog').textContent = `Вопрос ${cur+1} из ${qs.length}`;
+    document.getElementById('en').textContent = q.en;
+    const others = pool.filter(w => w.ru !== q.ru);
+    const opts = shuffle([q, ...shuffle(others).slice(0,3)]);
+    const c = document.getElementById('opts');
+    c.innerHTML = '';
+    opts.forEach(o => {
+        const b = document.createElement('button');
+        b.className = 'opt';
+        b.textContent = o.ru;
+        b.onclick = () => pick(b, o.ru, q.ru);
+        c.appendChild(b);
+    });
+}
+
+function pick(btn, sel, correct){
+    if(answered) return;
+    answered = true;
+    document.querySelectorAll('.opt').forEach(b => b.style.pointerEvents = 'none');
+    if(sel === correct){ btn.classList.add('ok'); score++; }
+    else {
+        btn.classList.add('bad');
+        document.querySelectorAll('.opt').forEach(b => { if(b.textContent === correct) b.classList.add('ok'); });
+    }
+    setTimeout(()=>{ cur++; cur < qs.length ? show() : done(); }, 1400);
+}
+
+function done(){
+    document.getElementById('quiz').style.display = 'none';
+    document.getElementById('res').style.display = 'block';
+    const p = Math.round(score/qs.length*100);
+    document.getElementById('sc').textContent = `${score} / ${qs.length}`;
+    const m = p<40?'Попробуй ещё раз — слова нужно повторить!':p<70?'Неплохо, но ещё есть над чем поработать.':p<95?'Хороший результат!':'Отлично! Все слова знаешь!';
+    document.getElementById('msg').textContent = m;
+    const ob = document.getElementById('btn-other');
+    if(activeSet==='sheet'){ ob.textContent='📚 Попробовать слова из книги'; ob.onclick=()=>go('book'); ob.style.display='block'; }
+    else { ob.textContent='📝 Попробовать слова с листика'; ob.onclick=()=>go('sheet'); ob.style.display='block'; }
+}
+
+function retry(){ go(activeSet); }
+function say(){
+    const t = document.getElementById('en').textContent;
+    if('speechSynthesis' in window){ speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(t); u.lang='en-US'; speechSynthesis.speak(u); }
+}
+</script>
+</body>
+</html>
