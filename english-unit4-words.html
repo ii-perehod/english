@@ -13,66 +13,74 @@ body {
     display: flex; align-items: center; justify-content: center; padding: 20px;
 }
 .page { max-width: 460px; width: 100%; }
-h1 { text-align: center; font-size: 1.5em; margin-bottom: 4px;
+h1 { text-align: center; font-size: 1.4em; margin-bottom: 4px;
      background: linear-gradient(90deg, #00d2ff, #7b2ff7);
      -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-.sub { text-align: center; color: #666; font-size: 0.82em; margin-bottom: 28px; }
-.btn { display: block; width: 100%; padding: 16px 20px; border: none; border-radius: 12px;
-       font-size: 1em; font-weight: 600; cursor: pointer; transition: all 0.2s; margin-bottom: 12px; }
+.sub { text-align: center; color: #666; font-size: 0.8em; margin-bottom: 24px; }
+.btn { display: block; width: 100%; padding: 15px 20px; border: none; border-radius: 12px;
+       font-size: 0.95em; font-weight: 600; cursor: pointer; transition: all 0.2s; margin-bottom: 10px; }
 .btn-a { background: rgba(0,210,255,0.08); border: 1px solid rgba(0,210,255,0.4); color: #00d2ff; }
 .btn-a:hover { background: rgba(0,210,255,0.18); transform: translateY(-2px); }
 .btn-b { background: rgba(123,47,247,0.08); border: 1px solid rgba(123,47,247,0.4); color: #b388ff; }
 .btn-b:hover { background: rgba(123,47,247,0.18); transform: translateY(-2px); }
-.progress { font-size: 0.78em; color: #666; text-align: center; margin-bottom: 14px; }
-.card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08);
-        border-radius: 14px; padding: 28px 24px; text-align: center; margin-bottom: 20px; }
-.en { font-size: 1.9em; font-weight: 700; color: #00d2ff; margin-bottom: 6px; }
-.label { font-size: 0.78em; color: #666; margin-bottom: 8px; }
-.speak { background: none; border: 1px solid rgba(0,210,255,0.3); color: rgba(0,210,255,0.6);
-         padding: 4px 12px; border-radius: 6px; cursor: pointer; font-size: 0.78em; }
-.speak:hover { color: #00d2ff; border-color: #00d2ff; }
-.opts { display: flex; flex-direction: column; gap: 9px; }
+.btn-g { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); color: #666; }
+.btn-g:hover { color: #999; }
+
+/* Progress */
+.prog { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+.prog-bar { flex: 1; height: 4px; background: rgba(255,255,255,0.08); border-radius: 2px; }
+.prog-fill { height: 100%; border-radius: 2px; background: linear-gradient(90deg,#00d2ff,#7b2ff7); transition: width .3s; }
+.prog-txt { font-size: 0.76em; color: #666; white-space: nowrap; }
+
+/* CARD FLIP */
+.scene { width: 100%; height: 200px; perspective: 900px; cursor: pointer; margin-bottom: 16px; }
+.card3d { width: 100%; height: 100%; position: relative; transform-style: preserve-3d; transition: transform .5s ease; }
+.card3d.flipped { transform: rotateY(180deg); }
+.face { position: absolute; inset: 0; border-radius: 16px;
+        backface-visibility: hidden; -webkit-backface-visibility: hidden;
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        padding: 24px; }
+.front { background: #1a1a3e; border: 1px solid rgba(0,210,255,0.3); }
+.back  { background: #1a2e1a; border: 1px solid rgba(0,200,100,0.3);
+         transform: rotateY(180deg); }
+.face-label { font-size: 0.72em; color: #555; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
+.face-word { font-size: 1.8em; font-weight: 700; color: #00d2ff; text-align: center; }
+.face-ru { font-size: 1.4em; font-weight: 600; color: #4dff90; text-align: center; }
+.face-hint { font-size: 0.76em; color: #444; margin-top: 10px; }
+.speak-btn { background: none; border: 1px solid rgba(0,210,255,0.25); color: rgba(0,210,255,0.5);
+             padding: 3px 10px; border-radius: 5px; cursor: pointer; font-size: 0.74em; margin-top: 8px; }
+.speak-btn:hover { color: #00d2ff; border-color: #00d2ff; }
+
+/* After flip buttons */
+.know-row { display: flex; gap: 10px; margin-bottom: 14px; }
+.know-row .btn { margin: 0; flex: 1; }
+.btn-know { background: rgba(0,200,100,0.1); border: 1px solid rgba(0,200,100,0.4); color: #4dff90; }
+.btn-know:hover { background: rgba(0,200,100,0.2); }
+.btn-noknow { background: rgba(200,80,80,0.1); border: 1px solid rgba(200,80,80,0.4); color: #ff8080; }
+.btn-noknow:hover { background: rgba(200,80,80,0.2); }
+
+/* QUIZ */
+.opts { display: flex; flex-direction: column; gap: 8px; }
 .opt { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1);
-       border-radius: 8px; padding: 14px 18px; cursor: pointer; font-size: 0.93em;
-       transition: all 0.15s; text-align: left; color: #ddd; }
-.opt:hover { background: rgba(0,210,255,0.07); border-color: rgba(0,210,255,0.3); }
-.opt.ok { background: rgba(0,200,100,0.15); border-color: #00c864; color: #00ff88; pointer-events: none; }
-.opt.bad { background: rgba(200,50,50,0.15); border-color: #cc4444; color: #ff7070; pointer-events: none; }
-.result { text-align: center; padding: 20px 0; }
-.score { font-size: 3em; font-weight: 700; color: #00d2ff; margin-bottom: 6px; }
-.msg { font-size: 0.88em; color: #888; margin-bottom: 24px; }
+       border-radius: 8px; padding: 13px 16px; cursor: pointer; font-size: 0.9em;
+       transition: all .15s; text-align: left; color: #ddd; }
+.opt:hover:not(:disabled) { background: rgba(0,210,255,0.07); border-color: rgba(0,210,255,0.3); }
+.opt.ok  { background: rgba(0,200,100,0.15); border-color: #00c864; color: #00ff88; }
+.opt.bad { background: rgba(200,50,50,0.15); border-color: #cc4444; color: #ff7070; }
+.round-tag { display: inline-block; font-size: 0.74em; padding: 2px 10px; border-radius: 12px; margin-bottom: 14px;
+             background: rgba(255,180,0,0.1); border: 1px solid rgba(255,180,0,0.3); color: #ffd060; }
+
+/* Result */
+.result { text-align: center; padding: 16px 0; }
+.score { font-size: 2.8em; font-weight: 700; color: #00d2ff; }
+.msg { font-size: 0.85em; color: #888; margin: 6px 0 22px; }
 </style>
 </head>
 <body>
 <div class="page">
-    <h1>Unit IV · Словарный квиз</h1>
-    <p class="sub">Лесные ресурсы · Forest Resources Management</p>
-
-    <div id="start">
-        <button class="btn btn-a" onclick="go('sheet')">📝 Слова с листика &nbsp;<small style="opacity:.6">(10 слов)</small></button>
-        <button class="btn btn-b" onclick="go('book')">📚 Слова из книги Unit 4 &nbsp;<small style="opacity:.6">(24 слова)</small></button>
-        <button class="btn" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.1);color:#888;font-size:.85em" onclick="window.location='index.html'">← Назад</button>
-    </div>
-
-    <div id="quiz" style="display:none">
-        <div class="progress" id="prog"></div>
-        <div class="card">
-            <div class="en" id="en"></div>
-            <div class="label">Выбери перевод:</div>
-            <button class="speak" onclick="say()">🔊 Прослушать</button>
-        </div>
-        <div class="opts" id="opts"></div>
-    </div>
-
-    <div id="res" style="display:none">
-        <div class="result">
-            <div class="score" id="sc"></div>
-            <div class="msg" id="msg"></div>
-            <button class="btn btn-a" onclick="retry()">Пройти ещё раз</button>
-            <button class="btn btn-b" onclick="go('book')" id="btn-other" style="display:none"></button>
-            <button class="btn" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.1);color:#888" onclick="window.location='index.html'">← На главную</button>
-        </div>
-    </div>
+<h1>Unit IV · Словарный квиз</h1>
+<p class="sub">Forest Resources Management</p>
+<div id="root"></div>
 </div>
 <script>
 const sets = {
@@ -116,68 +124,193 @@ const sets = {
     ]
 };
 
-let cur = 0, score = 0, qs = [], pool = [], answered = false, activeSet = '';
+// All words pool for distractors
+const allWords = [...sets.sheet, ...sets.book];
+
+let mode = ''; // 'learn' or 'quiz'
+let words = [];
+let qi = 0;
+let flipped = false;
+let quizRound = 1;
+let wrongList = [];
+let quizScore = 0;
+let quizTotal = 0;
+let answered = false;
+let activeSet = '';
 
 function shuffle(a){ return [...a].sort(()=>Math.random()-.5); }
+function say(t){ if('speechSynthesis' in window){ speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(t); u.lang='en-US'; speechSynthesis.speak(u); } }
+function stopProp(e){ e.stopPropagation(); }
 
-function go(name){
+function render(html){ document.getElementById('root').innerHTML = html; }
+
+// ---- SCREENS ----
+
+function showStart(){
+    render(`
+        <button class="btn btn-a" onclick="startSet('sheet')">📝 Слова с листика <small style="opacity:.5">(10 слов)</small></button>
+        <button class="btn btn-b" onclick="startSet('book')">📚 Слова из книги Unit 4 <small style="opacity:.5">(24 слова)</small></button>
+        <button class="btn btn-g" onclick="location.href='index.html'">← Назад</button>
+    `);
+}
+
+function startSet(name){
     activeSet = name;
-    pool = [...sets.sheet, ...sets.book];
-    qs = shuffle(sets[name]);
-    cur = 0; score = 0;
-    document.getElementById('start').style.display = 'none';
-    document.getElementById('res').style.display = 'none';
-    document.getElementById('quiz').style.display = 'block';
-    show();
+    words = shuffle([...sets[name]]);
+    qi = 0;
+    mode = 'learn';
+    showLearn();
 }
 
-function show(){
+// ---- LEARN MODE ----
+
+function showLearn(){
+    flipped = false;
+    const w = words[qi];
+    render(`
+        <div class="prog">
+            <div class="prog-bar"><div class="prog-fill" style="width:${Math.round(qi/words.length*100)}%"></div></div>
+            <span class="prog-txt">${qi+1} / ${words.length}</span>
+        </div>
+        <div class="scene" onclick="flipCard()" id="scene">
+            <div class="card3d" id="card">
+                <div class="face front">
+                    <div class="face-label">английский</div>
+                    <div class="face-word">${w.en}</div>
+                    <div class="face-hint">нажми, чтобы увидеть перевод</div>
+                    <button class="speak-btn" onclick="stopProp(event);say('${w.en.replace(/'/g,"\\'")}')">🔊</button>
+                </div>
+                <div class="face back">
+                    <div class="face-label">перевод</div>
+                    <div class="face-ru">${w.ru}</div>
+                    <div class="face-word" style="font-size:1.1em;margin-top:8px">${w.en}</div>
+                </div>
+            </div>
+        </div>
+        <div class="know-row" id="know-row" style="display:none">
+            <button class="btn btn-noknow" onclick="markWord(false)">✗ Не знаю</button>
+            <button class="btn btn-know" onclick="markWord(true)">✓ Знаю</button>
+        </div>
+        <button class="btn btn-g" style="font-size:.8em" onclick="showStart()">← Выбор набора</button>
+    `);
+}
+
+function flipCard(){
+    if(flipped) return;
+    flipped = true;
+    document.getElementById('card').classList.add('flipped');
+    document.getElementById('know-row').style.display = 'flex';
+    say(words[qi].en);
+}
+
+function markWord(knows){
+    if(!flipped) return;
+    qi++;
+    if(qi < words.length){
+        showLearn();
+    } else {
+        // Done with all cards — start quiz
+        startQuiz();
+    }
+}
+
+// ---- QUIZ MODE ----
+
+function startQuiz(){
+    mode = 'quiz';
+    wrongList = [];
+    quizScore = 0;
+    quizTotal = words.length;
+    qi = 0;
+    quizRound = 1;
+    const quizWords = shuffle([...words]);
+    window._quizQueue = quizWords;
+    showQuiz();
+}
+
+function showQuiz(){
     answered = false;
-    const q = qs[cur];
-    document.getElementById('prog').textContent = `Вопрос ${cur+1} из ${qs.length}`;
-    document.getElementById('en').textContent = q.en;
-    const others = pool.filter(w => w.ru !== q.ru);
-    const opts = shuffle([q, ...shuffle(others).slice(0,3)]);
-    const c = document.getElementById('opts');
-    c.innerHTML = '';
-    opts.forEach(o => {
-        const b = document.createElement('button');
-        b.className = 'opt';
-        b.textContent = o.ru;
-        b.onclick = () => pick(b, o.ru, q.ru);
-        c.appendChild(b);
-    });
+    const queue = window._quizQueue;
+    if(qi >= queue.length){
+        if(wrongList.length === 0){
+            showQuizDone();
+        } else {
+            showRoundDone();
+        }
+        return;
+    }
+    const w = queue[qi];
+    const distractors = shuffle(allWords.filter(x=>x.ru!==w.ru)).slice(0,3).map(x=>x.ru);
+    const opts = shuffle([w.ru, ...distractors]);
+
+    render(`
+        <div class="prog">
+            <div class="prog-bar"><div class="prog-fill" style="width:${Math.round(qi/queue.length*100)}%"></div></div>
+            <span class="prog-txt">${qi+1} / ${queue.length}</span>
+        </div>
+        ${quizRound > 1 ? `<div class="round-tag">🔁 Повтор неправильных · Круг ${quizRound}</div>` : ''}
+        <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:22px;text-align:center;margin-bottom:14px">
+            <div style="font-size:.72em;color:#555;margin-bottom:6px;text-transform:uppercase;letter-spacing:1px">переведи слово</div>
+            <div style="font-size:1.9em;font-weight:700;color:#00d2ff;margin-bottom:8px">${w.en}</div>
+            <button class="speak-btn" onclick="say('${w.en.replace(/'/g,"\\'")}')">🔊 Прослушать</button>
+        </div>
+        <div class="opts">
+            ${opts.map(o=>`<button class="opt" onclick="pickOpt(this,'${encodeURIComponent(o)}','${encodeURIComponent(w.ru)}')">${o}</button>`).join('')}
+        </div>
+    `);
 }
 
-function pick(btn, sel, correct){
+function pickOpt(btn, selEnc, correctEnc){
     if(answered) return;
     answered = true;
-    document.querySelectorAll('.opt').forEach(b => b.style.pointerEvents = 'none');
-    if(sel === correct){ btn.classList.add('ok'); score++; }
-    else {
+    const sel = decodeURIComponent(selEnc);
+    const correct = decodeURIComponent(correctEnc);
+    document.querySelectorAll('.opt').forEach(b=>b.style.pointerEvents='none');
+    if(sel === correct){
+        btn.classList.add('ok');
+        quizScore++;
+    } else {
         btn.classList.add('bad');
-        document.querySelectorAll('.opt').forEach(b => { if(b.textContent === correct) b.classList.add('ok'); });
+        document.querySelectorAll('.opt').forEach(b=>{ if(b.textContent===correct) b.classList.add('ok'); });
+        wrongList.push(window._quizQueue[qi]);
     }
-    setTimeout(()=>{ cur++; cur < qs.length ? show() : done(); }, 1400);
+    setTimeout(()=>{ qi++; showQuiz(); }, 1300);
 }
 
-function done(){
-    document.getElementById('quiz').style.display = 'none';
-    document.getElementById('res').style.display = 'block';
-    const p = Math.round(score/qs.length*100);
-    document.getElementById('sc').textContent = `${score} / ${qs.length}`;
-    const m = p<40?'Попробуй ещё раз — слова нужно повторить!':p<70?'Неплохо, но ещё есть над чем поработать.':p<95?'Хороший результат!':'Отлично! Все слова знаешь!';
-    document.getElementById('msg').textContent = m;
-    const ob = document.getElementById('btn-other');
-    if(activeSet==='sheet'){ ob.textContent='📚 Попробовать слова из книги'; ob.onclick=()=>go('book'); ob.style.display='block'; }
-    else { ob.textContent='📝 Попробовать слова с листика'; ob.onclick=()=>go('sheet'); ob.style.display='block'; }
+function showRoundDone(){
+    const wrong = wrongList.length;
+    render(`
+        <div class="result">
+            <div style="font-size:.8em;color:#666;margin-bottom:8px">Круг ${quizRound} завершён</div>
+            <div class="score">${window._quizQueue.length - wrong} / ${window._quizQueue.length}</div>
+            <div class="msg">${wrong} слов требуют повтора. Повторяем!</div>
+            <button class="btn btn-a" onclick="nextRound()">Повторить неправильные (${wrong})</button>
+        </div>
+    `);
 }
 
-function retry(){ go(activeSet); }
-function say(){
-    const t = document.getElementById('en').textContent;
-    if('speechSynthesis' in window){ speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(t); u.lang='en-US'; speechSynthesis.speak(u); }
+function nextRound(){
+    quizRound++;
+    window._quizQueue = shuffle([...wrongList]);
+    wrongList = [];
+    qi = 0;
+    showQuiz();
 }
+
+function showQuizDone(){
+    const pct = Math.round(quizScore/quizTotal*100);
+    render(`
+        <div class="result">
+            <div style="font-size:.8em;color:#666;margin-bottom:8px">Проверка завершена!</div>
+            <div class="score">${quizScore} / ${quizTotal}</div>
+            <div class="msg">${pct===100?'Все слова знаешь!':pct>=80?'Отличный результат!':pct>=60?'Хороший результат!':'Стоит ещё поучить.'}</div>
+            <button class="btn btn-a" onclick="startSet(activeSet)">Учить заново</button>
+            <button class="btn btn-g" onclick="showStart()">← Выбор набора</button>
+        </div>
+    `);
+}
+
+showStart();
 </script>
 </body>
 </html>
