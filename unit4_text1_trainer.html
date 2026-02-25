@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unit IV · Text 1 · Forests of the Earth</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family:'Segoe UI',Arial,sans-serif;
+  background:linear-gradient(135deg,#0f0c29,#302b63,#24243e);
+  min-height:100vh; color:#fff;
+  display:flex; flex-direction:column; align-items:center; padding-bottom:30px;
+}
+h1 { margin:5px 0 2px; font-size:1.2em; text-shadow:0 0 20px rgba(167,139,250,0.5); }
+.subtitle { color:#a78bfa; margin-bottom:8px; font-size:0.85em; }
+
+.screen {
+  background:rgba(255,255,255,0.08); backdrop-filter:blur(10px);
+  border:1px solid rgba(255,255,255,0.15); border-radius:20px;
+  padding:15px 20px; width:640px; max-width:92vw;
+  text-align:center; animation:fadeIn .35s ease; margin-top:5px;
+}
+@keyframes fadeIn { from{opacity:0;transform:translateY(15px)} to{opacity:1;transform:translateY(0)} }
+
+/* BUTTONS */
+.big-btn {
+  padding:12px 28px; border:none;
+  background:linear-gradient(135deg,#a78bfa,#60a5fa);
+  color:#0f0c29; border-radius:25px; font-size:1em; font-weight:700;
+  cursor:pointer; transition:transform .2s; margin:4px;
+}
+.big-btn:hover { transform:scale(1.04); }
+.big-btn-outline {
+  background:transparent; border:2px solid #a78bfa; color:#a78bfa;
+  padding:10px 20px; border-radius:25px; font-size:.95em; font-weight:600;
+  cursor:pointer; transition:all .2s; margin:4px;
+}
+.big-btn-outline:hover { background:rgba(167,139,250,0.15); }
+.btn-row { display:flex; gap:8px; justify-content:center; margin-top:12px; flex-wrap:wrap; }
+
+/* SETUP GRID */
+.section-label {
+  font-size:.78em; color:#64748b; text-transform:uppercase; letter-spacing:1px;
+  margin:14px 0 8px; border-top:1px solid rgba(255,255,255,0.07); padding-top:14px;
+}
+.section-label:first-of-type { border-top:none; padding-top:0; margin-top:4px; }
+.mode-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+.mode-card {
+  padding:12px 8px; border:1px solid rgba(255,255,255,0.15);
+  background:rgba(255,255,255,0.05); border-radius:12px;
+  cursor:pointer; transition:all .25s; font-size:.82em; line-height:1.3;
+}
+.mode-card:hover { border-color:#a78bfa; background:rgba(167,139,250,0.15); transform:translateY(-2px); }
+.mc-icon { font-size:1.6em; display:block; margin-bottom:4px; }
+.mc-name { font-weight:600; color:#e2e8f0; }
+.mc-desc { font-size:.78em; color:#64748b; margin-top:2px; }
+
+/* PROGRESS */
+.progress-wrap { width:100%; height:5px; background:rgba(255,255,255,.1); border-radius:3px; margin:8px 0 12px; overflow:hidden; }
+.progress-bar  { height:100%; background:linear-gradient(90deg,#a78bfa,#60a5fa); border-radius:3px; transition:width .4s; }
+
+/* READ */
+.text-area { text-align:left; line-height:2.0; font-size:.93em; margin:10px 0; max-height:340px; overflow-y:auto; padding:4px; }
+.sent-span { cursor:pointer; border-radius:4px; padding:1px 2px; transition:background .2s; }
+.sent-span:hover { background:rgba(167,139,250,0.2); }
+.sent-highlight { background:rgba(167,139,250,0.3) !important; }
+
+/* BLANKS */
+.text-blanks { text-align:left; line-height:2.6; font-size:.9em; margin:10px 0; max-height:320px; overflow-y:auto; padding:4px; }
+.blank-wrap { display:inline-block; position:relative; }
+.blank-input {
+  border:none; border-bottom:2px dashed #a78bfa; background:transparent;
+  color:#e2e8f0; font-family:inherit; font-size:.92em; outline:none;
+  text-align:center; padding:0 2px; margin:0 2px; vertical-align:baseline;
+}
+.blank-input.correct { border-bottom-color:#4ade80; color:#4ade80; pointer-events:none; }
+.blank-input.wrong   { border-bottom-color:#f87171; color:#f87171; }
+.blank-hint { position:absolute; bottom:-16px; left:50%; transform:translateX(-50%); font-size:.7em; color:#4ade80; white-space:nowrap; pointer-events:none; }
+
+/* FIRST LETTERS */
+.text-first { text-align:left; line-height:2.1; font-size:.9em; margin:10px 0; max-height:340px; overflow-y:auto; padding:4px; }
+.fl-hidden { color:transparent; background:rgba(255,255,255,.12); border-radius:2px; cursor:pointer; }
+.fl-hidden:hover { background:rgba(167,139,250,.25); }
+.fl-hidden.shown  { color:#4ade80; background:transparent; cursor:default; }
+
+/* MEMORY */
+.mem-textarea {
+  width:100%; min-height:190px; background:rgba(0,0,0,.3);
+  border:1px solid rgba(255,255,255,.15); border-radius:12px;
+  color:#e2e8f0; font-family:inherit; font-size:.9em; line-height:1.7;
+  padding:12px; outline:none; resize:vertical; margin:10px 0;
+}
+.mem-textarea:focus { border-color:#a78bfa; }
+.mem-result { text-align:left; line-height:2.0; font-size:.9em; margin:10px 0; max-height:300px; overflow-y:auto; padding:8px 12px; background:rgba(0,0,0,.2); border-radius:12px; }
+.mem-ok  { color:#4ade80; }
+.mem-bad { color:#f87171; text-decoration:underline; cursor:help; }
+
+/* PRONUNCIATION */
+.pron-sent { font-size:1.15em; font-weight:600; color:#60a5fa; text-align:center; margin:12px 0 8px; line-height:1.5; }
+.mic-btn {
+  width:68px; height:68px; border-radius:50%; border:3px solid #a78bfa;
+  background:rgba(167,139,250,.1); color:#a78bfa; font-size:1.7em;
+  cursor:pointer; transition:all .3s; display:flex; align-items:center; justify-content:center; margin:4px;
+}
+.mic-btn:hover { background:rgba(167,139,250,.2); transform:scale(1.05); }
+.mic-btn.recording { border-color:#f87171; background:rgba(248,113,113,.2); color:#f87171; animation:micPulse 1s infinite; }
+@keyframes micPulse { 0%,100%{box-shadow:0 0 0 0 rgba(248,113,113,.4)} 50%{box-shadow:0 0 0 12px rgba(248,113,113,0)} }
+.heard-text { font-size:.95em; color:#94a3b8; margin:8px 0; min-height:1.4em; }
+.pr-result  { font-size:1.1em; font-weight:600; margin:8px 0; }
+.pr-result.pr-ok   { color:#4ade80; }
+.pr-result.pr-fail { color:#f87171; }
+
+/* EXERCISES */
+.exhead { display:flex; align-items:center; gap:10px; margin-bottom:12px; }
+.ex-num { background:linear-gradient(135deg,#a78bfa,#60a5fa); color:#0f0c29; font-size:.75em; font-weight:700; padding:3px 10px; border-radius:12px; white-space:nowrap; }
+.ex-title { font-size:.88em; color:#94a3b8; }
+.q-prog   { font-size:.76em; color:#64748b; margin-left:auto; white-space:nowrap; }
+.qcard { background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1); border-radius:14px; padding:16px; margin-bottom:12px; text-align:left; }
+.qtext { font-size:.9em; color:#e2e8f0; line-height:1.6; margin-bottom:10px; }
+.qword { font-size:1.4em; font-weight:700; color:#60a5fa; text-align:center; margin-bottom:12px; }
+.opts  { display:flex; flex-direction:column; gap:7px; }
+.opt   { background:rgba(255,255,255,.04); border:2px solid rgba(255,255,255,.12); border-radius:12px; padding:11px 14px; cursor:pointer; font-size:.88em; transition:all .2s; color:#e2e8f0; }
+.opt:hover { border-color:#a78bfa; background:rgba(167,139,250,.1); }
+.opt.ok  { border-color:#4ade80; background:rgba(74,222,128,.12); color:#4ade80; pointer-events:none; }
+.opt.bad { border-color:#f87171; background:rgba(248,113,113,.12); color:#f87171; pointer-events:none; }
+.cats { display:flex; gap:8px; flex-wrap:wrap; justify-content:center; margin-bottom:6px; }
+.cat-btn { padding:10px 18px; border-radius:12px; border:2px solid; cursor:pointer; font-size:.88em; font-weight:600; transition:all .2s; }
+.cat-simple { border-color:rgba(74,222,128,.4); color:#4ade80; background:rgba(74,222,128,.07); }
+.cat-simple:hover { background:rgba(74,222,128,.18); }
+.cat-deriv  { border-color:rgba(96,165,250,.4); color:#60a5fa; background:rgba(96,165,250,.07); }
+.cat-deriv:hover  { background:rgba(96,165,250,.18); }
+.cat-comp   { border-color:rgba(167,139,250,.4); color:#a78bfa; background:rgba(167,139,250,.07); }
+.cat-comp:hover   { background:rgba(167,139,250,.18); }
+.cat-result { font-size:.84em; padding:8px 12px; border-radius:10px; text-align:center; margin-top:10px; }
+.cat-result.ok  { background:rgba(74,222,128,.1); color:#4ade80; }
+.cat-result.bad { background:rgba(248,113,113,.1); color:#f87171; }
+.fill-sent  { font-size:.9em; color:#e2e8f0; line-height:1.8; margin-bottom:10px; }
+.fill-blank { color:#a78bfa; font-weight:600; }
+.hint-box   { background:rgba(167,139,250,.06); border:1px solid rgba(167,139,250,.2); border-radius:10px; padding:10px 14px; margin-bottom:10px; }
+.hint-q { font-size:.84em; color:#a78bfa; margin-bottom:3px; }
+.hint-l { font-size:.78em; color:#64748b; font-style:italic; }
+.inp-row { display:flex; gap:8px; }
+.inp { flex:1; background:rgba(255,255,255,.06); border:2px solid rgba(255,255,255,.15); border-radius:10px; padding:10px 14px; color:#e2e8f0; font-size:.9em; font-family:inherit; outline:none; }
+.inp:focus  { border-color:#a78bfa; }
+.inp.ok  { border-color:#4ade80; color:#4ade80; }
+.inp.bad { border-color:#f87171; color:#f87171; }
+.chk { background:rgba(167,139,250,.12); border:2px solid rgba(167,139,250,.4); color:#a78bfa; padding:10px 14px; border-radius:10px; cursor:pointer; font-size:.88em; white-space:nowrap; }
+.chk:hover { background:rgba(167,139,250,.22); }
+.speak-btn { background:none; border:1px solid rgba(167,139,250,.3); color:rgba(167,139,250,.7); padding:3px 10px; border-radius:6px; cursor:pointer; font-size:.76em; margin:4px 0 8px; }
+.speak-btn:hover { color:#a78bfa; border-color:#a78bfa; }
+
+/* RESULTS */
+.result-big { font-size:3em; font-weight:800; background:linear-gradient(135deg,#a78bfa,#60a5fa); -webkit-background-clip:text; -webkit-text-fill-color:transparent; margin:10px 0; }
+.result-grade { font-size:1.2em; margin-bottom:12px; }
+.round-badge { display:inline-block; padding:4px 12px; background:rgba(167,139,250,.2); border-radius:20px; font-size:.85em; color:#a78bfa; margin-bottom:10px; }
+
+@media(max-width:500px) { .mode-grid{grid-template-columns:repeat(2,1fr)} }
+</style>
+</head>
+<body>
+<h1>English Quiz</h1>
+<p class="subtitle">Unit IV · Text 1 · Forests of the Earth</p>
+<div id="app"></div>
+<script>
+// ── TEXT DATA ─────────────────────────────────────────────────────────────────
+const SENTENCES = [
+  "Long time ago almost 2/3 of the land was covered with forests, but today more than a half of them has been destroyed.",
+  "When an ax rings in some remote tropical forests or taiga, it strikes all too close to home.",
+  "When the habitat of half the world's plant and animal species is destroyed at a rate of 50 acres every minute, we all pay the price.",
+  "Forests have yielded precious medicines, food crop varieties and much more.",
+  "They are habitat for many rare birds and other wildlife.",
+  "And the lives of hundreds of millions of people depend on the forests for survival.",
+  "Large tracts of forest are of great importance for the global oxygen and carbon circulation.",
+  "Their quantity influences greatly the radiation balance, the atmosphere circulation and moisture of the air, the water regime of the land.",
+  "According to the existing estimations, during the Neolithic revolution, the forest covered 62 billion hectares of the land.",
+  "Within 10 thousand years of forest annihilation their total area shortened to 40 billion hectares and the average woodland to 30%.",
+  "However, virgin forests occupy at present only 15 billion hectares — mainly in Russia, Canada, Amazonia.",
+  "In the majority of regions all or almost all virgin forests were replaced by the secondary ones, including planted forests.",
+  "In our days the forest annihilation goes very fast: annually more than 20 million hectares are annihilated.",
+  "Especially dangerous situation is in the zone of the tropical forests.",
+  "According to FAO, in the early 90s approximately 17 million hectares of forests were annihilated annually.",
+  "If the situation does not change, in half a century their final destruction will occur.",
+  "Moreover, the tropical forests are cut down with the speed which exceeds the speed of their natural restoration 15 times.",
+  "These forests have more than a half of all flora and fauna species represented on the Earth."
+];
+const FULL_TEXT = SENTENCES.join(' ');
+const SENT_COLORS = ['#e2e8f0','#a78bfa','#60a5fa','#4ade80','#fbbf24','#f87171','#fb923c','#22d3ee'];
+
+// ── EXERCISE DATA ─────────────────────────────────────────────────────────────
+const EX1 = [
+  { q:"How do people's lives depend on the forests for survival?",
+    a:'The lives of hundreds of millions of people depend on the forests for survival',
+    opts:['The lives of hundreds of millions of people depend on the forests for survival','People use forests mainly for tourism and wood production','Scientists depend on forests for their research experiments','Modern cities get most of their oxygen from planted urban trees'] },
+  { q:'What happened to the forests within 10 thousand years of their annihilation?',
+    a:'Their total area shortened to 40 billion hectares and the average woodland to 30%',
+    opts:['Their total area shortened to 40 billion hectares and the average woodland to 30%','Forests doubled in size because of natural restoration','All virgin forests were completely and permanently destroyed','New types of forest appeared in place of the old ones'] },
+  { q:'Where can virgin forests be found today?',
+    a:'Mainly in Russia, Canada, and Amazonia',
+    opts:['Mainly in Russia, Canada, and Amazonia','In Western Europe and the British Isles','Only in tropical regions near the equator','In Africa, Australia, and Southern India'] },
+  { q:'Why is the situation in the zone of tropical forests especially dangerous?',
+    a:'Annually 17 million hectares are annihilated; forests are cut 15× faster than they restore; final destruction may occur in half a century',
+    opts:['Annually 17 million hectares are annihilated; forests are cut 15× faster than they restore; final destruction may occur in half a century','Tropical forests produce too much oxygen and cause climate imbalance','Acid rain destroys tropical forests much faster than northern ones','Tropical forests attract too many tourists, causing environmental damage'] },
+  { q:'Why do we call the tropical forests "the lungs of the planet"?',
+    a:"Because they contain more than half of all flora and fauna species and are vital for the Earth's oxygen and carbon balance",
+    opts:["Because they contain more than half of all flora and fauna species and are vital for the Earth's oxygen and carbon balance",'Because animals in tropical forests breathe air that is cleaner than elsewhere','Because most medical researchers live and work in tropical regions','Because tropical forests produce acid rain that cleanses the atmosphere'] }
+];
+
+const EX2 = [
+  {en:'habitat',                              ru:'среда обитания',                               opts:['среда обитания','природная зона','экосистема','биосфера']},
+  {en:'food crop varieties',                  ru:'сорта продовольственных культур',              opts:['сорта продовольственных культур','сельскохозяйственные угодья','виды пищевых ресурсов','продукты питания']},
+  {en:'global oxygen and carbon circulation', ru:'глобальный круговорот кислорода и углерода',  opts:['глобальный круговорот кислорода и углерода','мировое загрязнение воздуха','обмен газами в атмосфере','выброс парниковых газов']},
+  {en:'radiation balance',                    ru:'радиационный баланс',                          opts:['радиационный баланс','тепловое загрязнение','солнечная активность','климатический режим']},
+  {en:'water regime',                         ru:'водный режим',                                  opts:['водный режим','режим осадков','уровень грунтовых вод','водные ресурсы']},
+  {en:'cattle-breeding',                      ru:'скотоводство',                                  opts:['скотоводство','земледелие','лесоводство','рыболовство']},
+  {en:'forest annihilation',                  ru:'уничтожение лесов',                             opts:['уничтожение лесов','лесные пожары','деградация лесов','лесонасаждение']},
+  {en:'woodland',                             ru:'лесная площадь, лесной массив',                opts:['лесная площадь, лесной массив','заповедная зона','лесопосадка','пригородный парк']},
+  {en:'virgin forests',                       ru:'девственные (нетронутые) леса',                opts:['девственные (нетронутые) леса','вторичные леса','посаженные леса','тропические джунгли']},
+  {en:'natural restoration',                  ru:'естественное восстановление',                  opts:['естественное восстановление','искусственное лесонасаждение','природная среда','экологическая реабилитация']},
+  {en:'flora and fauna species',              ru:'виды флоры и фауны',                            opts:['виды флоры и фауны','природные экосистемы','биологическое разнообразие','животный и растительный мир']}
+];
+
+const EX3 = [
+  {word:'plant',          cat:'simple', explain:'Корневое слово без аффиксов'},
+  {word:'variety',        cat:'deriv',  explain:'vary + -iety → производное'},
+  {word:'wildlife',       cat:'comp',   explain:'wild + life → сложное'},
+  {word:'circulation',    cat:'deriv',  explain:'circulate + -ion → производное'},
+  {word:'cattle-breeding',cat:'comp',   explain:'cattle + breeding → сложное'},
+  {word:'to replace',     cat:'deriv',  explain:'re- + place → производное'},
+  {word:'secondary',      cat:'deriv',  explain:'second + -ary → производное'},
+  {word:'including',      cat:'deriv',  explain:'in- + clude + -ing → производное'},
+  {word:'dangerous',      cat:'deriv',  explain:'danger + -ous → производное'},
+  {word:'result',         cat:'simple', explain:'Корневое слово'},
+  {word:'to decrease',    cat:'deriv',  explain:'de- + crease → производное'},
+  {word:'change',         cat:'simple', explain:'Корневое слово'},
+  {word:'destruction',    cat:'deriv',  explain:'destruct + -ion → производное'},
+  {word:'to represent',   cat:'deriv',  explain:'re- + present → производное'},
+  {word:'restoration',    cat:'deriv',  explain:'restore + -ation → производное'},
+  {word:'greenhouse',     cat:'comp',   explain:'green + house → сложное'}
+];
+
+const EX4 = [
+  {before:'Forests have yielded precious medicines,', blank:'food crop varieties', after:'and much more.', hint1:'Что ещё леса давали людям помимо лекарств? (3 слова)', hint2:'food cr...', audio:'Forests have yielded precious medicines, food crop varieties and much more.'},
+  {before:'When', blank:'the habitat', after:"of half the world's plant and animal species is destroyed at a rate of 50 acres every minute, we all pay the price.", hint1:'Что уничтожается? Место обитания животных и растений.', hint2:'the h...', audio:"When the habitat of half the world's plant and animal species is destroyed at a rate of 50 acres every minute, we all pay the price."},
+  {before:'Forests are habitat for many rare birds and', blank:'other wildlife', after:'.', hint1:'Кто ещё, кроме птиц, живёт в лесах?', hint2:'other w...', audio:'Forests are habitat for many rare birds and other wildlife.'},
+  {before:'The lives of hundreds of millions of people', blank:'depend on', after:'the forests for survival.', hint1:'Какой фразовый глагол означает «зависеть от»? (2 слова)', hint2:'dep...', audio:'The lives of hundreds of millions of people depend on the forests for survival.'},
+  {before:'Large tracts of forest are of great importance for the global oxygen and carbon', blank:'circulation', after:'.', hint1:'Как называется круговорот кислорода и углерода?', hint2:'circ...', audio:'Large tracts of forest are of great importance for the global oxygen and carbon circulation.'},
+  {before:'If the situation does not change, in half a century their final destruction', blank:'will occur', after:'.', hint1:'Что произойдёт? Future Simple, 2 слова.', hint2:'will o...', audio:'If the situation does not change, in half a century their final destruction will occur.'}
+];
+
+// ── HELPERS ───────────────────────────────────────────────────────────────────
+const app = document.getElementById('app');
+function escH(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function shuffle(a){ return [...a].sort(()=>Math.random()-.5); }
+function speak(t){ if(!window.speechSynthesis) return; speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(t); u.lang='en-GB'; u.rate=0.88; speechSynthesis.speak(u); }
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+let pronIdx=0, pronRec=null, listenIdx=SENTENCES.length;
+let blanksPct=25;
+let exAnswered=false, exHints=0;
+let ex1i=0,ex1s=0, ex2i=0,ex2s=0, ex3i=0,ex3s=0, ex4i=0,ex4s=0;
+
+// ── SETUP ─────────────────────────────────────────────────────────────────────
+function showSetup(){
+  speechSynthesis.cancel(); listenIdx=SENTENCES.length;
+  app.innerHTML=`
+  <div class="screen">
+    <div class="section-label">Тренажёр текста</div>
+    <div class="mode-grid">
+      <div class="mode-card" onclick="startRead()">
+        <span class="mc-icon">📖</span><span class="mc-name">Читать</span>
+        <span class="mc-desc">Нажми на предложение, чтобы услышать</span>
+      </div>
+      <div class="mode-card" onclick="startBlanks(25)">
+        <span class="mc-icon">✏️</span><span class="mc-name">Пропуски 25%</span>
+        <span class="mc-desc">Каждое 4-е слово скрыто</span>
+      </div>
+      <div class="mode-card" onclick="startBlanks(50)">
+        <span class="mc-icon">✏️✏️</span><span class="mc-name">Пропуски 50%</span>
+        <span class="mc-desc">Каждое 2-е слово скрыто</span>
+      </div>
+      <div class="mode-card" onclick="startFirstLetters()">
+        <span class="mc-icon">🔤</span><span class="mc-name">Первые буквы</span>
+        <span class="mc-desc">Нажми на слово, чтобы открыть</span>
+      </div>
+      <div class="mode-card" onclick="startMemory()">
+        <span class="mc-icon">🧠</span><span class="mc-name">По памяти</span>
+        <span class="mc-desc">Напиши весь текст целиком</span>
+      </div>
+      <div class="mode-card" onclick="startPronunciation()">
+        <span class="mc-icon">🎤</span><span class="mc-name">Произношение</span>
+        <span class="mc-desc">Слушай и повторяй по предложениям</span>
+      </div>
+    </div>
+    <div class="section-label">Задания учебника</div>
+    <div class="mode-grid">
+      <div class="mode-card" onclick="startEx(1)">
+        <span class="mc-icon">❓</span><span class="mc-name">Задание 1</span>
+        <span class="mc-desc">Вопросы по тексту (${EX1.length} вопр.)</span>
+      </div>
+      <div class="mode-card" onclick="startEx(2)">
+        <span class="mc-icon">🔠</span><span class="mc-name">Задание 2</span>
+        <span class="mc-desc">Русские эквиваленты (${EX2.length} слов)</span>
+      </div>
+      <div class="mode-card" onclick="startEx(3)">
+        <span class="mc-icon">🔧</span><span class="mc-name">Задание 3</span>
+        <span class="mc-desc">Словообразование (${EX3.length} слов)</span>
+      </div>
+      <div class="mode-card" onclick="startEx(4)">
+        <span class="mc-icon">📝</span><span class="mc-name">Задание 4</span>
+        <span class="mc-desc">Заполни пропуск (${EX4.length} предл.)</span>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ── READ MODE ─────────────────────────────────────────────────────────────────
+function startRead(){
+  const html = SENTENCES.map((s,i)=>
+    `<span class="sent-span" style="color:${SENT_COLORS[i%SENT_COLORS.length]}" data-i="${i}" onclick="speakSent(${i})">${escH(s)} </span>`
+  ).join('');
+  app.innerHTML=`
+  <div class="screen">
+    <div class="exhead"><span class="ex-num">Читать</span><span class="ex-title">Нажми на предложение — послушаешь</span></div>
+    <div class="text-area">${html}</div>
+    <div class="btn-row">
+      <button class="big-btn" onclick="listenAll()">▶ Весь текст</button>
+      <button class="big-btn-outline" onclick="stopAll()">■ Стоп</button>
+      <button class="big-btn-outline" onclick="showSetup()">← Назад</button>
+    </div>
+  </div>`;
+}
+function speakSent(i){
+  stopAll();
+  document.querySelectorAll('.sent-span').forEach(s=>s.classList.remove('sent-highlight'));
+  const sp=document.querySelector(`.sent-span[data-i="${i}"]`);
+  if(sp) sp.classList.add('sent-highlight');
+  speak(SENTENCES[i]);
+}
+function listenAll(){ stopAll(); listenIdx=0; playNext(); }
+function playNext(){
+  if(listenIdx>=SENTENCES.length){ document.querySelectorAll('.sent-span').forEach(s=>s.classList.remove('sent-highlight')); return; }
+  document.querySelectorAll('.sent-span').forEach(s=>s.classList.remove('sent-highlight'));
+  const sp=document.querySelector(`.sent-span[data-i="${listenIdx}"]`);
+  if(sp){ sp.classList.add('sent-highlight'); sp.scrollIntoView({behavior:'smooth',block:'nearest'}); }
+  const u=new SpeechSynthesisUtterance(SENTENCES[listenIdx]);
+  u.lang='en-GB'; u.rate=0.85;
+  u.onend=()=>{ listenIdx++; setTimeout(playNext,350); };
+  speechSynthesis.cancel(); speechSynthesis.speak(u);
+}
+function stopAll(){ speechSynthesis.cancel(); listenIdx=SENTENCES.length; document.querySelectorAll('.sent-span').forEach(s=>s.classList.remove('sent-highlight')); }
+
+// ── BLANKS MODE ───────────────────────────────────────────────────────────────
+function startBlanks(pct){ blanksPct=pct; renderBlanks(pct); }
+
+function renderBlanks(pct){
+  const tokens = FULL_TEXT.match(/\S+|\s+/g) || [];
+  const blankable = [];
+  tokens.forEach((t,i)=>{ if(!/\s/.test(t) && t.replace(/[^a-zA-Z]/g,'').length>=4) blankable.push(i); });
+
+  const step = Math.round(100/pct);
+  const toBlank = new Set(blankable.filter((_,j)=>(j+1)%step===0));
+
+  let count=0;
+  const html = tokens.map((t,i)=>{
+    if(/\s/.test(t)) return t;
+    if(toBlank.has(i)){
+      count++;
+      const letters = t.replace(/[.,!?;:'"\-()—]/g,'');
+      const trail   = t.slice(letters.length);
+      const w = Math.max(50, letters.length*9+10);
+      return `<span class="blank-wrap"><input class="blank-input" style="width:${w}px" data-ans="${escH(letters.toLowerCase())}" autocomplete="off" autocorrect="off" spellcheck="false">${escH(trail)}</span>`;
+    }
+    return escH(t);
+  }).join('');
+
+  app.innerHTML=`
+  <div class="screen" style="animation:none">
+    <div class="exhead"><span class="ex-num">Пропуски ${pct}%</span><span class="ex-title">${count} пропусков — заполни и нажми Проверить</span></div>
+    <div class="text-blanks" id="tBlanks">${html}</div>
+    <div class="btn-row">
+      <button class="big-btn" onclick="checkBlanks()">Проверить</button>
+      <button class="big-btn-outline" onclick="startBlanks(${pct})">Сначала</button>
+      <button class="big-btn-outline" onclick="showSetup()">← Назад</button>
+    </div>
+    <div id="blanksRes" style="margin-top:10px;text-align:center"></div>
+  </div>`;
+
+  const inputs = [...document.querySelectorAll('.blank-input')];
+  inputs.forEach((inp,i)=>inp.addEventListener('keydown',e=>{ if(e.key==='Enter'){e.preventDefault(); if(i<inputs.length-1) inputs[i+1].focus(); else checkBlanks(); } }));
+  if(inputs.length) inputs[0].focus();
+}
+
+function checkBlanks(){
+  const inputs = [...document.querySelectorAll('.blank-input:not(.correct)')];
+  let wrong=0;
+  inputs.forEach(inp=>{
+    const val = inp.value.trim().toLowerCase().replace(/[^a-z0-9'-]/g,'');
+    if(val===inp.dataset.ans){
+      inp.classList.add('correct'); inp.disabled=true;
+    } else {
+      wrong++;
+      inp.classList.add('wrong');
+      if(!inp.parentElement.querySelector('.blank-hint')){
+        const h=document.createElement('div'); h.className='blank-hint'; h.textContent=inp.dataset.ans;
+        inp.parentElement.appendChild(h);
+      }
+      setTimeout(()=>inp.classList.remove('wrong'),800);
+    }
+  });
+  const all=[...document.querySelectorAll('.blank-input')];
+  const done=all.filter(i=>i.classList.contains('correct')).length;
+  const pct=Math.round(done/all.length*100);
+  const res=document.getElementById('blanksRes');
+  if(wrong===0){
+    res.innerHTML=`<div class="result-big">${pct}%</div><div class="result-grade">🏆 Все пропуски верно!</div>`;
+  } else {
+    res.innerHTML=`<div style="font-size:.9em;color:#94a3b8">${pct}% верно. Ошибок: ${wrong}. Исправь и проверь снова.</div>`;
+  }
+}
+
+// ── FIRST LETTERS ─────────────────────────────────────────────────────────────
+function startFirstLetters(){
+  const tokens = FULL_TEXT.match(/\S+|\s+/g) || [];
+  const html = tokens.map(t=>{
+    if(/\s/.test(t)) return t;
+    if(t.length<=2 || !/[a-zA-Z]/.test(t)) return escH(t);
+    return escH(t[0])+`<span class="fl-hidden" onclick="this.classList.add('shown')">${escH(t.slice(1))}</span>`;
+  }).join('');
+  app.innerHTML=`
+  <div class="screen">
+    <div class="exhead"><span class="ex-num">Первые буквы</span><span class="ex-title">Нажми на скрытую часть, чтобы открыть</span></div>
+    <div class="text-first">${html}</div>
+    <div class="btn-row">
+      <button class="big-btn" onclick="document.querySelectorAll('.fl-hidden').forEach(e=>e.classList.add('shown'))">Открыть всё</button>
+      <button class="big-btn-outline" onclick="startFirstLetters()">Сначала</button>
+      <button class="big-btn-outline" onclick="showSetup()">← Назад</button>
+    </div>
+  </div>`;
+}
+
+// ── FROM MEMORY ───────────────────────────────────────────────────────────────
+function startMemory(){
+  app.innerHTML=`
+  <div class="screen">
+    <div class="exhead"><span class="ex-num">По памяти</span><span class="ex-title">Напиши текст целиком</span></div>
+    <textarea class="mem-textarea" id="memIn" placeholder="Long time ago almost 2/3 of the land..."></textarea>
+    <div class="btn-row">
+      <button class="big-btn" onclick="checkMemory()">Проверить</button>
+      <button class="big-btn-outline" onclick="showSetup()">← Назад</button>
+    </div>
+  </div>`;
+  document.getElementById('memIn').focus();
+}
+function checkMemory(){
+  const input=document.getElementById('memIn').value;
+  const uWords=input.trim().split(/\s+/);
+  const tWords=FULL_TEXT.trim().split(/\s+/);
+  let correct=0;
+  const res=tWords.map((tw,i)=>{
+    const tc=tw.toLowerCase().replace(/[^a-z0-9]/g,'');
+    const uc=(uWords[i]||'').toLowerCase().replace(/[^a-z0-9]/g,'');
+    if(tc===uc){ correct++; return `<span class="mem-ok">${escH(tw)}</span>`; }
+    return `<span class="mem-bad" title="Написано: ${escH(uWords[i]||'—')}">${escH(tw)}</span>`;
+  });
+  const pct=Math.round(correct/tWords.length*100);
+  const grade=pct===100?'🏆 Идеально!':pct>=80?'😎 Отлично!':pct>=60?'👍 Неплохо':pct>=40?'📖 Нужно подучить':'💪 Попробуй ещё раз';
+  app.innerHTML=`
+  <div class="screen">
+    <div class="result-big">${pct}%</div>
+    <div class="result-grade">${grade}</div>
+    <div style="font-size:.85em;color:#94a3b8;margin-bottom:10px">${correct} из ${tWords.length} слов верно</div>
+    <div class="mem-result">${res.join(' ')}</div>
+    <div class="btn-row">
+      <button class="big-btn" onclick="startMemory()">Попробовать снова</button>
+      <button class="big-btn-outline" onclick="showSetup()">← Назад</button>
+    </div>
+  </div>`;
+}
+
+// ── PRONUNCIATION ─────────────────────────────────────────────────────────────
+function startPronunciation(){ pronIdx=0; buildPronScreen(); showPronSent(); }
+function buildPronScreen(){
+  app.innerHTML=`
+  <div class="screen" style="animation:none">
+    <div class="exhead"><span class="ex-num">Произношение</span><span class="ex-title" id="prCnt"></span></div>
+    <div class="progress-wrap"><div class="progress-bar" id="prProg" style="width:0%"></div></div>
+    <div class="pron-sent" id="prSent"></div>
+    <div style="display:flex;gap:12px;justify-content:center">
+      <button class="mic-btn" onclick="speak(window._pCS)" title="Послушать">🔊</button>
+      <button class="mic-btn" id="prMic" onclick="pronRecord()" title="Говорить">🎤</button>
+    </div>
+    <div class="heard-text" id="prHeard"></div>
+    <div class="pr-result"  id="prRes"></div>
+    <div class="btn-row" id="prBtns"><button class="big-btn-outline" onclick="showSetup()">← Назад</button></div>
+  </div>`;
+}
+function showPronSent(){
+  if(pronIdx>=SENTENCES.length){ showPronDone(); return; }
+  const s=SENTENCES[pronIdx]; window._pCS=s;
+  document.getElementById('prCnt').textContent=(pronIdx+1)+' / '+SENTENCES.length;
+  document.getElementById('prProg').style.width=(pronIdx/SENTENCES.length*100)+'%';
+  document.getElementById('prSent').textContent=s;
+  document.getElementById('prHeard').textContent='';
+  document.getElementById('prRes').textContent='';
+  document.getElementById('prRes').className='pr-result';
+  if(pronRec){ pronRec.stop(); pronRec=null; }
+  document.getElementById('prMic').classList.remove('recording');
+  document.getElementById('prBtns').innerHTML='<button class="big-btn-outline" onclick="showSetup()">← Назад</button>';
+  speak(s);
+}
+function pronRecord(){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){ document.getElementById('prHeard').textContent='Используй Chrome для распознавания речи.'; return; }
+  if(pronRec){ pronRec.stop(); return; }
+  const mic=document.getElementById('prMic'); mic.classList.add('recording');
+  document.getElementById('prHeard').textContent='Говори...';
+  pronRec=new SR(); pronRec.lang='en-US'; pronRec.interimResults=true; pronRec.maxAlternatives=3;
+  pronRec.onresult=function(e){
+    let fin='',int='';
+    for(let i=0;i<e.results.length;i++){ if(e.results[i].isFinal) fin+=e.results[i][0].transcript; else int+=e.results[i][0].transcript; }
+    document.getElementById('prHeard').textContent=fin||int||'...';
+    if(fin) checkPron(fin);
+  };
+  pronRec.onerror=function(e){ mic.classList.remove('recording'); pronRec=null; document.getElementById('prHeard').textContent=e.error==='no-speech'?'Не услышал, попробуй ещё раз.':'Ошибка: '+e.error; };
+  pronRec.onend=function(){ mic.classList.remove('recording'); pronRec=null; };
+  pronRec.start();
+}
+function checkPron(heard){
+  const tgt=SENTENCES[pronIdx].toLowerCase().replace(/[^a-z0-9\s]/g,'');
+  const h=heard.toLowerCase().replace(/[^a-z0-9\s]/g,'');
+  const tw=tgt.split(/\s+/).filter(Boolean), hw=h.split(/\s+/).filter(Boolean);
+  let hits=0; hw.forEach(w=>{ if(tw.includes(w)) hits++; });
+  const pct=Math.round(hits/tw.length*100);
+  const resEl=document.getElementById('prRes');
+  document.getElementById('prHeard').innerHTML='Ты сказал: <b>'+escH(heard)+'</b> ('+pct+'%)';
+  if(pct>=60){
+    resEl.textContent=pct>=90?'Отлично! ✓':pct>=70?'Хорошо! ✓':'Неплохо!';
+    resEl.className='pr-result pr-ok';
+    document.getElementById('prBtns').innerHTML='<button class="big-btn" onclick="pronIdx++;showPronSent()">Далее →</button><button class="big-btn-outline" onclick="showSetup()">← Назад</button>';
+  } else {
+    resEl.textContent='Попробуй ещё раз';
+    resEl.className='pr-result pr-fail';
+    document.getElementById('prBtns').innerHTML='<button class="big-btn" onclick="pronRecord()">🎤 Ещё раз</button><button class="big-btn-outline" onclick="speak(window._pCS)">🔊 Послушать</button><button class="big-btn-outline" onclick="pronIdx++;showPronSent()">Пропустить →</button><button class="big-btn-outline" onclick="showSetup()">← Назад</button>';
+  }
+}
+function showPronDone(){
+  app.innerHTML='<div class="screen"><div style="font-size:2.5em;margin:15px 0">🎉</div><div style="font-size:1.3em;font-weight:600;margin-bottom:10px">Все '+SENTENCES.length+' предложений отработаны!</div><div class="btn-row"><button class="big-btn" onclick="startPronunciation()">Ещё раз</button><button class="big-btn-outline" onclick="showSetup()">← Назад</button></div></div>';
+}
+
+// ── EXERCISES ─────────────────────────────────────────────────────────────────
+function startEx(n){ exAnswered=false; exHints=0; if(n===1){ex1i=0;ex1s=0;renderEx1();}else if(n===2){ex2i=0;ex2s=0;renderEx2();}else if(n===3){ex3i=0;ex3s=0;renderEx3();}else{ex4i=0;ex4s=0;renderEx4();} }
+
+function renderEx1(){
+  const d=EX1[ex1i]; const opts=shuffle([...d.opts]);
+  app.innerHTML=`<div class="screen"><div class="exhead"><span class="ex-num">Задание 1</span><span class="ex-title">Вопросы по тексту</span><span class="q-prog">${ex1i+1}/${EX1.length}</span></div><div class="qcard"><div class="qtext">${escH(d.q)}</div><button class="speak-btn" onclick="speak(${JSON.stringify(d.q)})">🔊 Прослушать</button><div class="opts">${opts.map(o=>`<button class="opt" onclick="pickOpt1(this,'${encodeURIComponent(o)}','${encodeURIComponent(d.a)}')">${escH(o)}</button>`).join('')}</div></div><div class="btn-row"><button class="big-btn-outline" onclick="showSetup()">← Назад</button></div></div>`;
+}
+function pickOpt1(btn,se,ce){ if(exAnswered) return; exAnswered=true; const s=decodeURIComponent(se),c=decodeURIComponent(ce); document.querySelectorAll('.opt').forEach(b=>{b.style.pointerEvents='none'; if(b.textContent===c)b.classList.add('ok');}); if(s===c){btn.classList.add('ok');ex1s++;}else btn.classList.add('bad'); setTimeout(()=>{ex1i++;exAnswered=false;if(ex1i<EX1.length)renderEx1();else showExDone(1,ex1s,EX1.length);},1400); }
+
+function renderEx2(){
+  const d=EX2[ex2i]; const opts=shuffle([...d.opts]);
+  app.innerHTML=`<div class="screen"><div class="exhead"><span class="ex-num">Задание 2</span><span class="ex-title">Русские эквиваленты</span><span class="q-prog">${ex2i+1}/${EX2.length}</span></div><div class="qcard"><div class="qword">${escH(d.en)}</div><button class="speak-btn" onclick="speak(${JSON.stringify(d.en)})">🔊 Прослушать</button><div style="font-size:.82em;color:#64748b;margin-bottom:10px">Выбери правильный перевод:</div><div class="opts">${opts.map(o=>`<button class="opt" onclick="pickOpt2(this,'${encodeURIComponent(o)}','${encodeURIComponent(d.ru)}')">${escH(o)}</button>`).join('')}</div></div><div class="btn-row"><button class="big-btn-outline" onclick="showSetup()">← Назад</button></div></div>`;
+}
+function pickOpt2(btn,se,ce){ if(exAnswered) return; exAnswered=true; const s=decodeURIComponent(se),c=decodeURIComponent(ce); document.querySelectorAll('.opt').forEach(b=>{b.style.pointerEvents='none'; if(b.textContent===c)b.classList.add('ok');}); if(s===c){btn.classList.add('ok');ex2s++;}else btn.classList.add('bad'); setTimeout(()=>{ex2i++;exAnswered=false;if(ex2i<EX2.length)renderEx2();else showExDone(2,ex2s,EX2.length);},1400); }
+
+function renderEx3(){
+  const d=EX3[ex3i];
+  app.innerHTML=`<div class="screen"><div class="exhead"><span class="ex-num">Задание 3</span><span class="ex-title">Словообразование</span><span class="q-prog">${ex3i+1}/${EX3.length}</span></div><div class="qcard"><div class="qword">${escH(d.word)}</div><div style="font-size:.82em;color:#64748b;text-align:center;margin-bottom:12px">Определи способ образования:</div><div class="cats"><button class="cat-btn cat-simple" onclick="pickCat('simple','${d.cat}','${encodeURIComponent(d.explain)}')">Простое<br><small style="opacity:.7">корень без аффиксов</small></button><button class="cat-btn cat-deriv" onclick="pickCat('deriv','${d.cat}','${encodeURIComponent(d.explain)}')">Производное<br><small style="opacity:.7">суффикс/префикс</small></button><button class="cat-btn cat-comp" onclick="pickCat('comp','${d.cat}','${encodeURIComponent(d.explain)}')">Сложное<br><small style="opacity:.7">два корня</small></button></div><div id="catRes"></div></div><div class="btn-row"><button class="big-btn-outline" onclick="showSetup()">← Назад</button></div></div>`;
+  speak(d.word);
+}
+function pickCat(sel,correct,ee){ const e=decodeURIComponent(ee); document.querySelectorAll('.cat-btn').forEach(b=>b.style.pointerEvents='none'); const L={simple:'Простое',deriv:'Производное',comp:'Сложное'}; const ok=sel===correct; if(ok)ex3s++; document.getElementById('catRes').innerHTML=`<div class="cat-result ${ok?'ok':'bad'}">${ok?'✓ Правильно':'✗ Нет. Правильно: <b>'+L[correct]+'</b>'}. ${escH(e)}</div>`; setTimeout(()=>{ex3i++;if(ex3i<EX3.length)renderEx3();else showExDone(3,ex3s,EX3.length);},1700); }
+
+function renderEx4(){
+  const d=EX4[ex4i]; exHints=0;
+  app.innerHTML=`<div class="screen"><div class="exhead"><span class="ex-num">Задание 4</span><span class="ex-title">Заполни пропуск</span><span class="q-prog">${ex4i+1}/${EX4.length}</span></div><div class="qcard"><button class="speak-btn" onclick="speak(${JSON.stringify(d.audio)})">🔊 Прослушать предложение</button><div class="fill-sent">${escH(d.before)} <span class="fill-blank">_______</span> ${escH(d.after)}</div><div class="hint-box"><div class="hint-q">${escH(d.hint1)}</div><div class="hint-l" id="hintL"></div></div><div class="inp-row"><input class="inp" id="fillA" type="text" placeholder="Введи ответ..." autocomplete="off" autocorrect="off" spellcheck="false" onkeydown="if(event.key==='Enter')checkFill()"><button class="chk" onclick="checkFill()">Проверить</button></div><div id="fillR"></div></div><div class="btn-row"><button class="big-btn-outline" onclick="showSetup()">← Назад</button></div></div>`;
+  document.getElementById('fillA').focus();
+}
+function checkFill(){ const d=EX4[ex4i]; const val=document.getElementById('fillA').value.trim().toLowerCase(); const correct=d.blank.toLowerCase(); const inp=document.getElementById('fillA'); if(val===correct){ inp.classList.add('ok'); if(exHints===0)ex4s++; document.getElementById('fillR').innerHTML='<div style="color:#4ade80;font-size:.88em;margin-top:8px">✓ Правильно!</div>'; document.querySelector('.fill-sent').innerHTML=`${escH(d.before)} <span style="color:#4ade80;font-weight:700">${escH(d.blank)}</span> ${escH(d.after)}`; setTimeout(()=>{ex4i++;exHints=0;if(ex4i<EX4.length)renderEx4();else showExDone(4,ex4s,EX4.length);},1500); } else { inp.classList.add('bad'); exHints++; if(exHints===1){ document.getElementById('fillR').innerHTML='<div style="color:#64748b;font-size:.84em;margin-top:8px">Попробуй ещё раз.</div>'; document.getElementById('hintL').textContent=d.hint2; } else { document.getElementById('fillR').innerHTML=`<div style="font-size:.84em;margin-top:8px">Ответ: <b style="color:#60a5fa">${escH(d.blank)}</b></div>`; setTimeout(()=>{ex4i++;exHints=0;if(ex4i<EX4.length)renderEx4();else showExDone(4,ex4s,EX4.length);},2000); } setTimeout(()=>inp.classList.remove('bad'),600); } }
+
+function showExDone(n,s,t){
+  const pct=Math.round(s/t*100);
+  const grade=pct===100?'🏆 Идеально!':pct>=80?'😎 Отлично!':pct>=60?'👍 Неплохо':pct>=40?'📖 Надо подтянуть':'💪 Попробуй ещё раз';
+  app.innerHTML=`<div class="screen"><div style="font-size:.85em;color:#64748b;margin-bottom:6px">Задание ${n} завершено</div><div class="result-big">${pct}%</div><div class="result-grade">${grade}</div><div style="font-size:.85em;color:#94a3b8;margin-bottom:16px">${s} из ${t} правильно</div><div class="btn-row"><button class="big-btn" onclick="startEx(${n})">Повторить</button>${n<4?`<button class="big-btn-outline" onclick="startEx(${n+1})">Задание ${n+1} →</button>`:''}<button class="big-btn-outline" onclick="showSetup()">← Назад</button></div></div>`;
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+showSetup();
+</script>
+</body>
+</html>
