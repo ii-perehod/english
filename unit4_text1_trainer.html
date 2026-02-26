@@ -61,13 +61,13 @@ h1 { margin:5px 0 2px; font-size:1.2em; text-shadow:0 0 20px rgba(167,139,250,0.
 .progress-bar  { height:100%; background:linear-gradient(90deg,#a78bfa,#60a5fa); border-radius:3px; transition:width .4s; }
 
 /* READ */
-.text-area { text-align:left; line-height:2.0; font-size:.93em; margin:10px 0; max-height:340px; overflow-y:auto; padding:4px; }
+.text-area { text-align:left; line-height:2.0; font-size:.93em; margin:10px 0; padding:4px; }
 .sent-span { cursor:pointer; border-radius:4px; padding:1px 2px; transition:background .2s; }
 .sent-span:hover { background:rgba(167,139,250,0.2); }
 .sent-highlight { background:rgba(167,139,250,0.3) !important; }
 
 /* BLANKS */
-.text-blanks { text-align:left; line-height:2.6; font-size:.9em; margin:10px 0; max-height:320px; overflow-y:auto; padding:4px; }
+.text-blanks { text-align:left; line-height:2.6; font-size:.9em; margin:10px 0; padding:4px; }
 .blank-wrap { display:inline-block; position:relative; }
 .blank-input {
   border:none; border-bottom:2px dashed #a78bfa; background:transparent;
@@ -79,7 +79,7 @@ h1 { margin:5px 0 2px; font-size:1.2em; text-shadow:0 0 20px rgba(167,139,250,0.
 .blank-hint { position:absolute; bottom:-16px; left:50%; transform:translateX(-50%); font-size:.7em; color:#4ade80; white-space:nowrap; pointer-events:none; }
 
 /* FIRST LETTERS */
-.text-first { text-align:left; line-height:2.1; font-size:.9em; margin:10px 0; max-height:340px; overflow-y:auto; padding:4px; }
+.text-first { text-align:left; line-height:2.1; font-size:.9em; margin:10px 0; padding:4px; }
 .fl-hidden { color:transparent; background:rgba(255,255,255,.12); border-radius:2px; cursor:pointer; }
 .fl-hidden:hover { background:rgba(167,139,250,.25); }
 .fl-hidden.shown  { color:#4ade80; background:transparent; cursor:default; }
@@ -92,7 +92,7 @@ h1 { margin:5px 0 2px; font-size:1.2em; text-shadow:0 0 20px rgba(167,139,250,0.
   padding:12px; outline:none; resize:vertical; margin:10px 0;
 }
 .mem-textarea:focus { border-color:#a78bfa; }
-.mem-result { text-align:left; line-height:2.0; font-size:.9em; margin:10px 0; max-height:300px; overflow-y:auto; padding:8px 12px; background:rgba(0,0,0,.2); border-radius:12px; }
+.mem-result { text-align:left; line-height:2.0; font-size:.9em; margin:10px 0; padding:8px 12px; background:rgba(0,0,0,.2); border-radius:12px; }
 .mem-ok  { color:#4ade80; }
 .mem-bad { color:#f87171; text-decoration:underline; cursor:help; }
 
@@ -154,6 +154,7 @@ h1 { margin:5px 0 2px; font-size:1.2em; text-shadow:0 0 20px rgba(167,139,250,0.
 .result-big { font-size:3em; font-weight:800; background:linear-gradient(135deg,#a78bfa,#60a5fa); -webkit-background-clip:text; -webkit-text-fill-color:transparent; margin:10px 0; }
 .result-grade { font-size:1.2em; margin-bottom:12px; }
 .round-badge { display:inline-block; padding:4px 12px; background:rgba(167,139,250,.2); border-radius:20px; font-size:.85em; color:#a78bfa; margin-bottom:10px; }
+@keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.05)} }
 
 @media(max-width:500px) { .mode-grid{grid-template-columns:repeat(2,1fr)} }
 </style>
@@ -257,8 +258,12 @@ function speak(t){ if(!window.speechSynthesis) return; speechSynthesis.cancel();
 // ── STATE ─────────────────────────────────────────────────────────────────────
 let pronIdx=0, pronRec=null, listenIdx=SENTENCES.length;
 let blanksPct=25;
-let exAnswered=false, exHints=0;
-let ex1i=0,ex1s=0, ex2i=0,ex2s=0, ex3i=0,ex3s=0, ex4i=0,ex4s=0;
+let exAnswered=false, exHints=0, ex4WasWrong=false;
+// Per-exercise: queue (current round items), index, score, wrong list, round number
+let ex1Q=[],ex1i=0,ex1s=0,ex1W=[],ex1R=1;
+let ex2Q=[],ex2i=0,ex2s=0,ex2W=[],ex2R=1;
+let ex3Q=[],ex3i=0,ex3s=0,ex3W=[],ex3R=1;
+let ex4Q=[],ex4i=0,ex4s=0,ex4W=[],ex4R=1;
 
 // ── SETUP ─────────────────────────────────────────────────────────────────────
 function showSetup(){
@@ -549,38 +554,54 @@ function showPronDone(){
 }
 
 // ── EXERCISES ─────────────────────────────────────────────────────────────────
-function startEx(n){ exAnswered=false; exHints=0; if(n===1){ex1i=0;ex1s=0;renderEx1();}else if(n===2){ex2i=0;ex2s=0;renderEx2();}else if(n===3){ex3i=0;ex3s=0;renderEx3();}else{ex4i=0;ex4s=0;renderEx4();} }
+function startEx(n){ exAnswered=false; exHints=0;
+  if(n===1){ex1Q=shuffle([...EX1]);ex1i=0;ex1s=0;ex1W=[];ex1R=1;renderEx1();}
+  else if(n===2){ex2Q=shuffle([...EX2]);ex2i=0;ex2s=0;ex2W=[];ex2R=1;renderEx2();}
+  else if(n===3){ex3Q=shuffle([...EX3]);ex3i=0;ex3s=0;ex3W=[];ex3R=1;renderEx3();}
+  else{ex4Q=shuffle([...EX4]);ex4i=0;ex4s=0;ex4W=[];ex4R=1;renderEx4();}
+}
+function retryEx(n){exAnswered=false;exHints=0;
+  if(n===1){ex1Q=shuffle([...ex1W]);ex1i=0;ex1s=0;ex1W=[];ex1R++;renderEx1();}
+  else if(n===2){ex2Q=shuffle([...ex2W]);ex2i=0;ex2s=0;ex2W=[];ex2R++;renderEx2();}
+  else if(n===3){ex3Q=shuffle([...ex3W]);ex3i=0;ex3s=0;ex3W=[];ex3R++;renderEx3();}
+  else{ex4Q=shuffle([...ex4W]);ex4i=0;ex4s=0;ex4W=[];ex4R++;renderEx4();}
+}
 
 function renderEx1(){
-  const d=EX1[ex1i]; const opts=shuffle([...d.opts]);
-  app.innerHTML=`<div class="screen"><div class="exhead"><span class="ex-num">Задание 1</span><span class="ex-title">Вопросы по тексту</span><span class="q-prog">${ex1i+1}/${EX1.length}</span></div><div class="qcard"><div class="qtext">${escH(d.q)}</div><button class="speak-btn" onclick="speak(${JSON.stringify(d.q)})">🔊 Прослушать</button><div class="opts">${opts.map(o=>`<button class="opt" onclick="pickOpt1(this,'${encodeURIComponent(o)}','${encodeURIComponent(d.a)}')">${escH(o)}</button>`).join('')}</div></div><div class="btn-row"><button class="big-btn-outline" onclick="showSetup()">← Назад</button></div></div>`;
+  const d=ex1Q[ex1i]; const opts=shuffle([...d.opts]);
+  const rb=ex1R>1?`<div class="round-badge">Раунд ${ex1R} — повтор ошибок (${ex1Q.length})</div>`:'';
+  app.innerHTML=`<div class="screen">${rb}<div class="exhead"><span class="ex-num">Задание 1</span><span class="ex-title">Вопросы по тексту</span><span class="q-prog">${ex1i+1}/${ex1Q.length}</span></div><div class="qcard"><div class="qtext">${escH(d.q)}</div><button class="speak-btn" onclick="speak(${JSON.stringify(d.q)})">🔊 Прослушать</button><div class="opts">${opts.map(o=>`<button class="opt" onclick="pickOpt1(this,'${encodeURIComponent(o)}','${encodeURIComponent(d.a)}')">${escH(o)}</button>`).join('')}</div></div><div class="btn-row"><button class="big-btn-outline" onclick="showSetup()">← Назад</button></div></div>`;
 }
-function pickOpt1(btn,se,ce){ if(exAnswered) return; exAnswered=true; const s=decodeURIComponent(se),c=decodeURIComponent(ce); document.querySelectorAll('.opt').forEach(b=>{b.style.pointerEvents='none'; if(b.textContent===c)b.classList.add('ok');}); if(s===c){btn.classList.add('ok');ex1s++;}else btn.classList.add('bad'); setTimeout(()=>{ex1i++;exAnswered=false;if(ex1i<EX1.length)renderEx1();else showExDone(1,ex1s,EX1.length);},1400); }
+function pickOpt1(btn,se,ce){ if(exAnswered) return; exAnswered=true; const s=decodeURIComponent(se),c=decodeURIComponent(ce); document.querySelectorAll('.opt').forEach(b=>{b.style.pointerEvents='none'; if(b.textContent===c)b.classList.add('ok');}); if(s===c){btn.classList.add('ok');ex1s++;}else{btn.classList.add('bad');ex1W.push(ex1Q[ex1i]);} setTimeout(()=>{ex1i++;exAnswered=false;if(ex1i<ex1Q.length)renderEx1();else showExDone(1,ex1s,ex1Q.length,ex1W);},1400); }
 
 function renderEx2(){
-  const d=EX2[ex2i]; const opts=shuffle([...d.opts]);
-  app.innerHTML=`<div class="screen"><div class="exhead"><span class="ex-num">Задание 2</span><span class="ex-title">Русские эквиваленты</span><span class="q-prog">${ex2i+1}/${EX2.length}</span></div><div class="qcard"><div class="qword">${escH(d.en)}</div><button class="speak-btn" onclick="speak(${JSON.stringify(d.en)})">🔊 Прослушать</button><div style="font-size:.82em;color:#64748b;margin-bottom:10px">Выбери правильный перевод:</div><div class="opts">${opts.map(o=>`<button class="opt" onclick="pickOpt2(this,'${encodeURIComponent(o)}','${encodeURIComponent(d.ru)}')">${escH(o)}</button>`).join('')}</div></div><div class="btn-row"><button class="big-btn-outline" onclick="showSetup()">← Назад</button></div></div>`;
+  const d=ex2Q[ex2i]; const opts=shuffle([...d.opts]);
+  const rb=ex2R>1?`<div class="round-badge">Раунд ${ex2R} — повтор ошибок (${ex2Q.length})</div>`:'';
+  app.innerHTML=`<div class="screen">${rb}<div class="exhead"><span class="ex-num">Задание 2</span><span class="ex-title">Русские эквиваленты</span><span class="q-prog">${ex2i+1}/${ex2Q.length}</span></div><div class="qcard"><div class="qword">${escH(d.en)}</div><button class="speak-btn" onclick="speak(${JSON.stringify(d.en)})">🔊 Прослушать</button><div style="font-size:.82em;color:#64748b;margin-bottom:10px">Выбери правильный перевод:</div><div class="opts">${opts.map(o=>`<button class="opt" onclick="pickOpt2(this,'${encodeURIComponent(o)}','${encodeURIComponent(d.ru)}')">${escH(o)}</button>`).join('')}</div></div><div class="btn-row"><button class="big-btn-outline" onclick="showSetup()">← Назад</button></div></div>`;
 }
-function pickOpt2(btn,se,ce){ if(exAnswered) return; exAnswered=true; const s=decodeURIComponent(se),c=decodeURIComponent(ce); document.querySelectorAll('.opt').forEach(b=>{b.style.pointerEvents='none'; if(b.textContent===c)b.classList.add('ok');}); if(s===c){btn.classList.add('ok');ex2s++;}else btn.classList.add('bad'); setTimeout(()=>{ex2i++;exAnswered=false;if(ex2i<EX2.length)renderEx2();else showExDone(2,ex2s,EX2.length);},1400); }
+function pickOpt2(btn,se,ce){ if(exAnswered) return; exAnswered=true; const s=decodeURIComponent(se),c=decodeURIComponent(ce); document.querySelectorAll('.opt').forEach(b=>{b.style.pointerEvents='none'; if(b.textContent===c)b.classList.add('ok');}); if(s===c){btn.classList.add('ok');ex2s++;}else{btn.classList.add('bad');ex2W.push(ex2Q[ex2i]);} setTimeout(()=>{ex2i++;exAnswered=false;if(ex2i<ex2Q.length)renderEx2();else showExDone(2,ex2s,ex2Q.length,ex2W);},1400); }
 
 function renderEx3(){
-  const d=EX3[ex3i];
-  app.innerHTML=`<div class="screen"><div class="exhead"><span class="ex-num">Задание 3</span><span class="ex-title">Словообразование</span><span class="q-prog">${ex3i+1}/${EX3.length}</span></div><div class="qcard"><div class="qword">${escH(d.word)}</div><div style="font-size:.82em;color:#64748b;text-align:center;margin-bottom:12px">Определи способ образования:</div><div class="cats"><button class="cat-btn cat-simple" onclick="pickCat('simple','${d.cat}','${encodeURIComponent(d.explain)}')">Простое<br><small style="opacity:.7">корень без аффиксов</small></button><button class="cat-btn cat-deriv" onclick="pickCat('deriv','${d.cat}','${encodeURIComponent(d.explain)}')">Производное<br><small style="opacity:.7">суффикс/префикс</small></button><button class="cat-btn cat-comp" onclick="pickCat('comp','${d.cat}','${encodeURIComponent(d.explain)}')">Сложное<br><small style="opacity:.7">два корня</small></button></div><div id="catRes"></div></div><div class="btn-row"><button class="big-btn-outline" onclick="showSetup()">← Назад</button></div></div>`;
+  const d=ex3Q[ex3i];
+  const rb=ex3R>1?`<div class="round-badge">Раунд ${ex3R} — повтор ошибок (${ex3Q.length})</div>`:'';
+  app.innerHTML=`<div class="screen">${rb}<div class="exhead"><span class="ex-num">Задание 3</span><span class="ex-title">Словообразование</span><span class="q-prog">${ex3i+1}/${ex3Q.length}</span></div><div class="qcard"><div class="qword">${escH(d.word)}</div><div style="font-size:.82em;color:#64748b;text-align:center;margin-bottom:12px">Определи способ образования:</div><div class="cats"><button class="cat-btn cat-simple" onclick="pickCat('simple','${d.cat}','${encodeURIComponent(d.explain)}')">Простое<br><small style="opacity:.7">корень без аффиксов</small></button><button class="cat-btn cat-deriv" onclick="pickCat('deriv','${d.cat}','${encodeURIComponent(d.explain)}')">Производное<br><small style="opacity:.7">суффикс/префикс</small></button><button class="cat-btn cat-comp" onclick="pickCat('comp','${d.cat}','${encodeURIComponent(d.explain)}')">Сложное<br><small style="opacity:.7">два корня</small></button></div><div id="catRes"></div></div><div class="btn-row"><button class="big-btn-outline" onclick="showSetup()">← Назад</button></div></div>`;
   speak(d.word);
 }
-function pickCat(sel,correct,ee){ const e=decodeURIComponent(ee); document.querySelectorAll('.cat-btn').forEach(b=>b.style.pointerEvents='none'); const L={simple:'Простое',deriv:'Производное',comp:'Сложное'}; const ok=sel===correct; if(ok)ex3s++; document.getElementById('catRes').innerHTML=`<div class="cat-result ${ok?'ok':'bad'}">${ok?'✓ Правильно':'✗ Нет. Правильно: <b>'+L[correct]+'</b>'}. ${escH(e)}</div>`; setTimeout(()=>{ex3i++;if(ex3i<EX3.length)renderEx3();else showExDone(3,ex3s,EX3.length);},1700); }
+function pickCat(sel,correct,ee){ const e=decodeURIComponent(ee); document.querySelectorAll('.cat-btn').forEach(b=>b.style.pointerEvents='none'); const L={simple:'Простое',deriv:'Производное',comp:'Сложное'}; const ok=sel===correct; if(ok)ex3s++; else ex3W.push(ex3Q[ex3i]); document.getElementById('catRes').innerHTML=`<div class="cat-result ${ok?'ok':'bad'}">${ok?'✓ Правильно':'✗ Нет. Правильно: <b>'+L[correct]+'</b>'}. ${escH(e)}</div>`; setTimeout(()=>{ex3i++;if(ex3i<ex3Q.length)renderEx3();else showExDone(3,ex3s,ex3Q.length,ex3W);},1700); }
 
 function renderEx4(){
-  const d=EX4[ex4i]; exHints=0;
-  app.innerHTML=`<div class="screen"><div class="exhead"><span class="ex-num">Задание 4</span><span class="ex-title">Заполни пропуск</span><span class="q-prog">${ex4i+1}/${EX4.length}</span></div><div class="qcard"><button class="speak-btn" onclick="speak(${JSON.stringify(d.audio)})">🔊 Прослушать предложение</button><div class="fill-sent">${escH(d.before)} <span class="fill-blank">_______</span> ${escH(d.after)}</div><div class="hint-box"><div class="hint-q">${escH(d.hint1)}</div><div class="hint-l" id="hintL"></div></div><div class="inp-row"><input class="inp" id="fillA" type="text" placeholder="Введи ответ..." autocomplete="off" autocorrect="off" spellcheck="false" onkeydown="if(event.key==='Enter')checkFill()"><button class="chk" onclick="checkFill()">Проверить</button></div><div id="fillR"></div></div><div class="btn-row"><button class="big-btn-outline" onclick="showSetup()">← Назад</button></div></div>`;
+  const d=ex4Q[ex4i]; exHints=0; ex4WasWrong=false;
+  const rb=ex4R>1?`<div class="round-badge">Раунд ${ex4R} — повтор ошибок (${ex4Q.length})</div>`:'';
+  app.innerHTML=`<div class="screen">${rb}<div class="exhead"><span class="ex-num">Задание 4</span><span class="ex-title">Заполни пропуск</span><span class="q-prog">${ex4i+1}/${ex4Q.length}</span></div><div class="qcard"><button class="speak-btn" onclick="speak(${JSON.stringify(d.audio)})">🔊 Прослушать предложение</button><div class="fill-sent">${escH(d.before)} <span class="fill-blank">_______</span> ${escH(d.after)}</div><div class="hint-box"><div class="hint-q">${escH(d.hint1)}</div><div class="hint-l" id="hintL"></div></div><div class="inp-row"><input class="inp" id="fillA" type="text" placeholder="Введи ответ..." autocomplete="off" autocorrect="off" spellcheck="false" onkeydown="if(event.key==='Enter')checkFill()"><button class="chk" onclick="checkFill()">Проверить</button></div><div id="fillR"></div></div><div class="btn-row"><button class="big-btn-outline" onclick="showSetup()">← Назад</button></div></div>`;
   document.getElementById('fillA').focus();
 }
-function checkFill(){ const d=EX4[ex4i]; const val=document.getElementById('fillA').value.trim().toLowerCase(); const correct=d.blank.toLowerCase(); const inp=document.getElementById('fillA'); if(val===correct){ inp.classList.add('ok'); if(exHints===0)ex4s++; document.getElementById('fillR').innerHTML='<div style="color:#4ade80;font-size:.88em;margin-top:8px">✓ Правильно!</div>'; document.querySelector('.fill-sent').innerHTML=`${escH(d.before)} <span style="color:#4ade80;font-weight:700">${escH(d.blank)}</span> ${escH(d.after)}`; setTimeout(()=>{ex4i++;exHints=0;if(ex4i<EX4.length)renderEx4();else showExDone(4,ex4s,EX4.length);},1500); } else { inp.classList.add('bad'); exHints++; if(exHints===1){ document.getElementById('fillR').innerHTML='<div style="color:#64748b;font-size:.84em;margin-top:8px">Попробуй ещё раз.</div>'; document.getElementById('hintL').textContent=d.hint2; } else { document.getElementById('fillR').innerHTML=`<div style="font-size:.84em;margin-top:8px">Ответ: <b style="color:#60a5fa">${escH(d.blank)}</b></div>`; setTimeout(()=>{ex4i++;exHints=0;if(ex4i<EX4.length)renderEx4();else showExDone(4,ex4s,EX4.length);},2000); } setTimeout(()=>inp.classList.remove('bad'),600); } }
+function checkFill(){ const d=ex4Q[ex4i]; const val=document.getElementById('fillA').value.trim().toLowerCase(); const correct=d.blank.toLowerCase(); const inp=document.getElementById('fillA'); if(val===correct){ inp.classList.add('ok'); if(!ex4WasWrong)ex4s++; else ex4W.push(d); document.getElementById('fillR').innerHTML='<div style="color:#4ade80;font-size:.88em;margin-top:8px">✓ Правильно!</div>'; document.querySelector('.fill-sent').innerHTML=`${escH(d.before)} <span style="color:#4ade80;font-weight:700">${escH(d.blank)}</span> ${escH(d.after)}`; setTimeout(()=>{ex4i++;exHints=0;if(ex4i<ex4Q.length)renderEx4();else showExDone(4,ex4s,ex4Q.length,ex4W);},1500); } else { ex4WasWrong=true; inp.classList.add('bad'); exHints++; if(exHints===1){ document.getElementById('fillR').innerHTML='<div style="color:#64748b;font-size:.84em;margin-top:8px">Попробуй ещё раз.</div>'; document.getElementById('hintL').textContent=d.hint2; } else { if(!ex4W.includes(d))ex4W.push(d); document.getElementById('fillR').innerHTML=`<div style="font-size:.84em;margin-top:8px">Ответ: <b style="color:#60a5fa">${escH(d.blank)}</b></div>`; setTimeout(()=>{ex4i++;exHints=0;if(ex4i<ex4Q.length)renderEx4();else showExDone(4,ex4s,ex4Q.length,ex4W);},2000); } setTimeout(()=>inp.classList.remove('bad'),600); } }
 
-function showExDone(n,s,t){
+function showExDone(n,s,t,wrong){
   const pct=Math.round(s/t*100);
   const grade=pct===100?'🏆 Идеально!':pct>=80?'😎 Отлично!':pct>=60?'👍 Неплохо':pct>=40?'📖 Надо подтянуть':'💪 Попробуй ещё раз';
-  app.innerHTML=`<div class="screen"><div style="font-size:.85em;color:#64748b;margin-bottom:6px">Задание ${n} завершено</div><div class="result-big">${pct}%</div><div class="result-grade">${grade}</div><div style="font-size:.85em;color:#94a3b8;margin-bottom:16px">${s} из ${t} правильно</div><div class="btn-row"><button class="big-btn" onclick="startEx(${n})">Повторить</button>${n<4?`<button class="big-btn-outline" onclick="startEx(${n+1})">Задание ${n+1} →</button>`:''}<button class="big-btn-outline" onclick="showSetup()">← Назад</button></div></div>`;
+  const retryBtn=(wrong&&wrong.length>0)?`<button class="big-btn" style="background:linear-gradient(135deg,#f59e0b,#ef4444);animation:pulse 1.5s infinite" onclick="retryEx(${n})">🔁 Повторить ошибки (${wrong.length})</button>`:'';
+  app.innerHTML=`<div class="screen"><div style="font-size:.85em;color:#64748b;margin-bottom:6px">Задание ${n} завершено</div><div class="result-big">${pct}%</div><div class="result-grade">${grade}</div><div style="font-size:.85em;color:#94a3b8;margin-bottom:16px">${s} из ${t} правильно</div><div class="btn-row">${retryBtn}</div><div class="btn-row"><button class="big-btn-outline" onclick="startEx(${n})">Начать заново</button>${n<4?`<button class="big-btn-outline" onclick="startEx(${n+1})">Задание ${n+1} →</button>`:''}<button class="big-btn-outline" onclick="showSetup()">← Назад</button></div></div>`;
 }
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
