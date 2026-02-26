@@ -157,6 +157,12 @@ h1 { margin:5px 0 2px; font-size:1.2em; text-shadow:0 0 20px rgba(167,139,250,0.
 @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.05)} }
 
 @media(max-width:500px) { .mode-grid{grid-template-columns:repeat(2,1fr)} }
+
+/* ANALYSIS */
+.analysis-q { font-size:.86em; color:#a78bfa; margin:12px 0 6px; font-weight:600; }
+.analysis-hint { background:rgba(96,165,250,.08); border:1px solid rgba(96,165,250,.25); border-radius:10px; padding:10px 14px; font-size:.82em; color:#bfdbfe; line-height:1.55; margin:10px 0 6px; }
+.opt-sm { font-size:.82em !important; padding:8px 12px !important; }
+.hidden { display:none; }
 </style>
 </head>
 <body>
@@ -192,33 +198,68 @@ const SENT_COLORS = ['#e2e8f0','#a78bfa','#60a5fa','#4ade80','#fbbf24','#f87171'
 const EX1 = [
   { q:"How do people's lives depend on the forests for survival?",
     a:'The lives of hundreds of millions of people depend on the forests for survival',
-    opts:['The lives of hundreds of millions of people depend on the forests for survival','People use forests mainly for tourism and wood production','Scientists depend on forests for their research experiments','Modern cities get most of their oxygen from planted urban trees'] },
+    opts:['The lives of hundreds of millions of people depend on the forests for survival','People use forests mainly for tourism and wood production','Scientists depend on forests for their research experiments','Modern cities get most of their oxygen from planted urban trees'],
+    analysis:{
+      qtype:'Как именно (механизм / в чём именно)',
+      qtypeOpts:['Как именно (механизм / в чём именно)','Где (место)','Почему (причина)','Когда (время)'],
+      kw:'depend on',
+      kwOpts:["depend on","people's lives","forests","survival"],
+      tip:'Найди в тексте: "...depend on the forests for survival" — что стоит перед этой фразой? Это и будет ответ.'
+    }},
   { q:'What happened to the forests within 10 thousand years of their annihilation?',
     a:'Their total area shortened to 40 billion hectares and the average woodland to 30%',
-    opts:['Their total area shortened to 40 billion hectares and the average woodland to 30%','Forests doubled in size because of natural restoration','All virgin forests were completely and permanently destroyed','New types of forest appeared in place of the old ones'] },
+    opts:['Their total area shortened to 40 billion hectares and the average woodland to 30%','Forests doubled in size because of natural restoration','All virgin forests were completely and permanently destroyed','New types of forest appeared in place of the old ones'],
+    analysis:{
+      qtype:'Что произошло (факт / изменение)',
+      qtypeOpts:['Что произошло (факт / изменение)','Где (место)','Почему (причина)','Как (механизм)'],
+      kw:'10 thousand years',
+      kwOpts:['10 thousand years','happened','annihilation','within'],
+      tip:'Ищи в тексте конкретные цифры: "40 billion hectares" и "30%" — они описывают то, что произошло.'
+    }},
   { q:'Where can virgin forests be found today?',
     a:'Mainly in Russia, Canada, and Amazonia',
-    opts:['Mainly in Russia, Canada, and Amazonia','In Western Europe and the British Isles','Only in tropical regions near the equator','In Africa, Australia, and Southern India'] },
+    opts:['Mainly in Russia, Canada, and Amazonia','In Western Europe and the British Isles','Only in tropical regions near the equator','In Africa, Australia, and Southern India'],
+    analysis:{
+      qtype:'Где (место / расположение)',
+      qtypeOpts:['Где (место / расположение)','Когда (время)','Почему (причина)','Как (механизм)'],
+      kw:'virgin forests',
+      kwOpts:['virgin forests','be found','today','can'],
+      tip:'Virgin forests = нетронутые леса. Ищи в тексте перечисление стран после "mainly in..."'
+    }},
   { q:'Why is the situation in the zone of tropical forests especially dangerous?',
     a:'Annually 17 million hectares are annihilated; forests are cut 15× faster than they restore; final destruction may occur in half a century',
-    opts:['Annually 17 million hectares are annihilated; forests are cut 15× faster than they restore; final destruction may occur in half a century','Tropical forests produce too much oxygen and cause climate imbalance','Acid rain destroys tropical forests much faster than northern ones','Tropical forests attract too many tourists, causing environmental damage'] },
+    opts:['Annually 17 million hectares are annihilated; forests are cut 15× faster than they restore; final destruction may occur in half a century','Tropical forests produce too much oxygen and cause climate imbalance','Acid rain destroys tropical forests much faster than northern ones','Tropical forests attract too many tourists, causing environmental damage'],
+    analysis:{
+      qtype:'Почему (причина / объяснение)',
+      qtypeOpts:['Почему (причина / объяснение)','Что (факт)','Где (место)','Когда (время)'],
+      kw:'especially dangerous',
+      kwOpts:['especially dangerous','tropical forests','situation','zone'],
+      tip:'Ищи в тексте факты-доказательства: "17 million hectares", "15 times faster", "half a century" — это и есть причины опасности.'
+    }},
   { q:'Why do we call the tropical forests "the lungs of the planet"?',
     a:"Because they contain more than half of all flora and fauna species and are vital for the Earth's oxygen and carbon balance",
-    opts:["Because they contain more than half of all flora and fauna species and are vital for the Earth's oxygen and carbon balance",'Because animals in tropical forests breathe air that is cleaner than elsewhere','Because most medical researchers live and work in tropical regions','Because tropical forests produce acid rain that cleanses the atmosphere'] }
+    opts:["Because they contain more than half of all flora and fauna species and are vital for the Earth's oxygen and carbon balance",'Because animals in tropical forests breathe air that is cleaner than elsewhere','Because most medical researchers live and work in tropical regions','Because tropical forests produce acid rain that cleanses the atmosphere'],
+    analysis:{
+      qtype:'Почему (причина / объяснение)',
+      qtypeOpts:['Почему (причина / объяснение)','Что (факт)','Где (место)','Как (механизм)'],
+      kw:'lungs of the planet',
+      kwOpts:['lungs of the planet','tropical forests','flora and fauna','we call'],
+      tip:'"Lungs" — метафора: лёгкие планеты. Ищи что делают тропические леса для кислорода, углерода и биоразнообразия.'
+    }}
 ];
 
 const EX2 = [
-  {en:'habitat',                              ru:'среда обитания',                               opts:['среда обитания','природная зона','экосистема','биосфера']},
-  {en:'food crop varieties',                  ru:'сорта продовольственных культур',              opts:['сорта продовольственных культур','сельскохозяйственные угодья','виды пищевых ресурсов','продукты питания']},
-  {en:'global oxygen and carbon circulation', ru:'глобальный круговорот кислорода и углерода',  opts:['глобальный круговорот кислорода и углерода','мировое загрязнение воздуха','обмен газами в атмосфере','выброс парниковых газов']},
-  {en:'radiation balance',                    ru:'радиационный баланс',                          opts:['радиационный баланс','тепловое загрязнение','солнечная активность','климатический режим']},
-  {en:'water regime',                         ru:'водный режим',                                  opts:['водный режим','режим осадков','уровень грунтовых вод','водные ресурсы']},
-  {en:'cattle-breeding',                      ru:'скотоводство',                                  opts:['скотоводство','земледелие','лесоводство','рыболовство']},
-  {en:'forest annihilation',                  ru:'уничтожение лесов',                             opts:['уничтожение лесов','лесные пожары','деградация лесов','лесонасаждение']},
-  {en:'woodland',                             ru:'лесная площадь, лесной массив',                opts:['лесная площадь, лесной массив','заповедная зона','лесопосадка','пригородный парк']},
-  {en:'virgin forests',                       ru:'девственные (нетронутые) леса',                opts:['девственные (нетронутые) леса','вторичные леса','посаженные леса','тропические джунгли']},
-  {en:'natural restoration',                  ru:'естественное восстановление',                  opts:['естественное восстановление','искусственное лесонасаждение','природная среда','экологическая реабилитация']},
-  {en:'flora and fauna species',              ru:'виды флоры и фауны',                            opts:['виды флоры и фауны','природные экосистемы','биологическое разнообразие','животный и растительный мир']}
+  {en:'habitat',                              ru:'среда обитания',                               opts:['среда обитания','природная зона','экосистема','биосфера'],                                    tip:'habi- (лат. habere = занимать, иметь) → место, где организмы «живут». Буквально: их «дом».'},
+  {en:'food crop varieties',                  ru:'сорта продовольственных культур',              opts:['сорта продовольственных культур','сельскохозяйственные угодья','виды пищевых ресурсов','продукты питания'],  tip:'food = продовольственный; crop = культурное растение (то, что выращивают); variety = разновидность. Три слова — три компонента.'},
+  {en:'global oxygen and carbon circulation', ru:'глобальный круговорот кислорода и углерода',  opts:['глобальный круговорот кислорода и углерода','мировое загрязнение воздуха','обмен газами в атмосфере','выброс парниковых газов'], tip:'circulation (лат. circulare = двигаться по кругу) = круговорот. Global = планетарный. Два газа: oxygen (O₂) + carbon (CO₂).'},
+  {en:'radiation balance',                    ru:'радиационный баланс',                          opts:['радиационный баланс','тепловое загрязнение','солнечная активность','климатический режим'],    tip:'radiation = излучение (солнечная энергия); balance = равновесие (как весы). Сколько пришло — столько и ушло.'},
+  {en:'water regime',                         ru:'водный режим',                                  opts:['водный режим','режим осадков','уровень грунтовых вод','водные ресурсы'],                      tip:'regime (фр. régime) = режим, порядок. Water regime = как именно распределяется и движется вода на суше.'},
+  {en:'cattle-breeding',                      ru:'скотоводство',                                  opts:['скотоводство','земледелие','лесоводство','рыболовство'],                                      tip:'cattle = крупный рогатый скот; breeding (от breed = порода) = разведение. Cattle-breeding = разведение скота.'},
+  {en:'forest annihilation',                  ru:'уничтожение лесов',                             opts:['уничтожение лесов','лесные пожары','деградация лесов','лесонасаждение'],                      tip:'annihilate (лат. nihil = ничто) → «превратить в ничто» = полное уничтожение, не просто вырубка.'},
+  {en:'woodland',                             ru:'лесная площадь, лесной массив',                opts:['лесная площадь, лесной массив','заповедная зона','лесопосадка','пригородный парк'],           tip:'wood = лес/древесина + land = земля → земля, покрытая лесом. Woodland = лесные угодья.'},
+  {en:'virgin forests',                       ru:'девственные (нетронутые) леса',                opts:['девственные (нетронутые) леса','вторичные леса','посаженные леса','тропические джунгли'],    tip:'virgin = нетронутый, первозданный (ср. Virgin Islands). Леса, которых никогда не касался топор.'},
+  {en:'natural restoration',                  ru:'естественное восстановление',                  opts:['естественное восстановление','искусственное лесонасаждение','природная среда','экологическая реабилитация'], tip:'restore (лат. restaurare = восстанавливать) + -tion. Natural = без помощи человека, сам по себе.'},
+  {en:'flora and fauna species',              ru:'виды флоры и фауны',                            opts:['виды флоры и фауны','природные экосистемы','биологическое разнообразие','животный и растительный мир'], tip:'Flora — рим. богиня растений; Fauna — рим. богиня животных. Species = вид (биологическая единица классификации).'}
 ];
 
 const EX3 = [
@@ -259,6 +300,7 @@ function speak(t){ if(!window.speechSynthesis) return; speechSynthesis.cancel();
 let pronIdx=0, pronRec=null, listenIdx=SENTENCES.length;
 let blanksPct=25;
 let exAnswered=false, exHints=0, ex4WasWrong=false;
+let ex1AnalysisDone=false, ex2AnalysisDone=false;
 // Per-exercise: queue (current round items), index, score, wrong list, round number
 let ex1Q=[],ex1i=0,ex1s=0,ex1W=[],ex1R=1;
 let ex2Q=[],ex2i=0,ex2s=0,ex2W=[],ex2R=1;
@@ -561,25 +603,41 @@ function startEx(n){ exAnswered=false; exHints=0;
   else{ex4Q=shuffle([...EX4]);ex4i=0;ex4s=0;ex4W=[];ex4R=1;renderEx4();}
 }
 function retryEx(n){exAnswered=false;exHints=0;
-  if(n===1){ex1Q=shuffle([...ex1W]);ex1i=0;ex1s=0;ex1W=[];ex1R++;renderEx1();}
-  else if(n===2){ex2Q=shuffle([...ex2W]);ex2i=0;ex2s=0;ex2W=[];ex2R++;renderEx2();}
+  if(n===1){ex1AnalysisDone=false;ex1Q=shuffle([...ex1W]);ex1i=0;ex1s=0;ex1W=[];ex1R++;renderEx1();}
+  else if(n===2){ex2AnalysisDone=false;ex2Q=shuffle([...ex2W]);ex2i=0;ex2s=0;ex2W=[];ex2R++;renderEx2();}
   else if(n===3){ex3Q=shuffle([...ex3W]);ex3i=0;ex3s=0;ex3W=[];ex3R++;renderEx3();}
   else{ex4Q=shuffle([...ex4W]);ex4i=0;ex4s=0;ex4W=[];ex4R++;renderEx4();}
 }
 
 function renderEx1(){
-  const d=ex1Q[ex1i]; const opts=shuffle([...d.opts]);
+  const d=ex1Q[ex1i];
+  if(ex1R>1 && !ex1AnalysisDone && d.analysis){ showEx1Analysis(d); return; }
+  ex1AnalysisDone=false;
+  const opts=shuffle([...d.opts]);
   const rb=ex1R>1?`<div class="round-badge">Раунд ${ex1R} — повтор ошибок (${ex1Q.length})</div>`:'';
   app.innerHTML=`<div class="screen">${rb}<div class="exhead"><span class="ex-num">Задание 1</span><span class="ex-title">Вопросы по тексту</span><span class="q-prog">${ex1i+1}/${ex1Q.length}</span></div><div class="qcard"><div class="qtext">${escH(d.q)}</div><button class="speak-btn" onclick="speak(${JSON.stringify(d.q)})">🔊 Прослушать</button><div class="opts">${opts.map(o=>`<button class="opt" onclick="pickOpt1(this,'${encodeURIComponent(o)}','${encodeURIComponent(d.a)}')">${escH(o)}</button>`).join('')}</div></div><div class="btn-row"><button class="big-btn-outline" onclick="showSetup()">← Назад</button></div></div>`;
 }
 function pickOpt1(btn,se,ce){ if(exAnswered) return; exAnswered=true; const s=decodeURIComponent(se),c=decodeURIComponent(ce); document.querySelectorAll('.opt').forEach(b=>{b.style.pointerEvents='none'; if(b.textContent===c)b.classList.add('ok');}); if(s===c){btn.classList.add('ok');ex1s++;}else{btn.classList.add('bad');ex1W.push(ex1Q[ex1i]);} setTimeout(()=>{ex1i++;exAnswered=false;if(ex1i<ex1Q.length)renderEx1();else showExDone(1,ex1s,ex1Q.length,ex1W);},1400); }
 
 function renderEx2(){
-  const d=ex2Q[ex2i]; const opts=shuffle([...d.opts]);
+  const d=ex2Q[ex2i];
+  if(ex2R>1 && !ex2AnalysisDone && d.tip){ showEx2Hint(d); return; }
+  ex2AnalysisDone=false;
+  const opts=shuffle([...d.opts]);
   const rb=ex2R>1?`<div class="round-badge">Раунд ${ex2R} — повтор ошибок (${ex2Q.length})</div>`:'';
   app.innerHTML=`<div class="screen">${rb}<div class="exhead"><span class="ex-num">Задание 2</span><span class="ex-title">Русские эквиваленты</span><span class="q-prog">${ex2i+1}/${ex2Q.length}</span></div><div class="qcard"><div class="qword">${escH(d.en)}</div><button class="speak-btn" onclick="speak(${JSON.stringify(d.en)})">🔊 Прослушать</button><div style="font-size:.82em;color:#64748b;margin-bottom:10px">Выбери правильный перевод:</div><div class="opts">${opts.map(o=>`<button class="opt" onclick="pickOpt2(this,'${encodeURIComponent(o)}','${encodeURIComponent(d.ru)}')">${escH(o)}</button>`).join('')}</div></div><div class="btn-row"><button class="big-btn-outline" onclick="showSetup()">← Назад</button></div></div>`;
 }
 function pickOpt2(btn,se,ce){ if(exAnswered) return; exAnswered=true; const s=decodeURIComponent(se),c=decodeURIComponent(ce); document.querySelectorAll('.opt').forEach(b=>{b.style.pointerEvents='none'; if(b.textContent===c)b.classList.add('ok');}); if(s===c){btn.classList.add('ok');ex2s++;}else{btn.classList.add('bad');ex2W.push(ex2Q[ex2i]);} setTimeout(()=>{ex2i++;exAnswered=false;if(ex2i<ex2Q.length)renderEx2();else showExDone(2,ex2s,ex2Q.length,ex2W);},1400); }
+
+function showEx1Analysis(d){
+  const a=d.analysis;
+  const qtOpts=shuffle([...a.qtypeOpts]);
+  const kwOpts=shuffle([...a.kwOpts]);
+  app.innerHTML=`<div class="screen"><div class="round-badge">🔍 Разберём вопрос (Раунд ${ex1R})</div><div class="qcard"><div class="qtext">${escH(d.q)}</div><div id="ast1"><div class="analysis-q">❓ Что спрашивает этот вопрос?</div><div class="opts">${qtOpts.map(o=>`<button class="opt opt-sm" onclick="pickAType(this,'${encodeURIComponent(o)}','${encodeURIComponent(a.qtype)}')">${escH(o)}</button>`).join('')}</div></div><div id="ast2" class="hidden"><div class="analysis-q">🔑 Какое ключевое слово поможет найти ответ в тексте?</div><div class="opts">${kwOpts.map(w=>`<button class="opt opt-sm" onclick="pickAKw(this,'${encodeURIComponent(w)}','${encodeURIComponent(a.kw)}')">${escH(w)}</button>`).join('')}</div></div><div id="ast3" class="hidden"><div class="analysis-hint">💡 ${escH(a.tip)}</div><div class="btn-row"><button class="big-btn" onclick="ex1AnalysisDone=true;renderEx1()">→ Ответить на вопрос</button></div></div></div></div>`;
+}
+function pickAType(btn,se,ce){ const s=decodeURIComponent(se),c=decodeURIComponent(ce); document.querySelectorAll('#ast1 .opt').forEach(b=>{b.style.pointerEvents='none'; if(b.textContent===c)b.classList.add('ok');}); if(s===c)btn.classList.add('ok'); else btn.classList.add('bad'); setTimeout(()=>document.getElementById('ast2').classList.remove('hidden'),900); }
+function pickAKw(btn,se,ce){ const s=decodeURIComponent(se),c=decodeURIComponent(ce); document.querySelectorAll('#ast2 .opt').forEach(b=>{b.style.pointerEvents='none'; if(b.textContent===c)b.classList.add('ok');}); if(s===c)btn.classList.add('ok'); else btn.classList.add('bad'); setTimeout(()=>document.getElementById('ast3').classList.remove('hidden'),900); }
+function showEx2Hint(d){ app.innerHTML=`<div class="screen"><div class="round-badge">💡 Разберём термин (Раунд ${ex2R})</div><div class="qcard"><div class="qword">${escH(d.en)}</div><button class="speak-btn" onclick="speak(${JSON.stringify(d.en)})">🔊 Прослушать</button><div class="analysis-hint">${escH(d.tip)}</div><div class="btn-row"><button class="big-btn" onclick="ex2AnalysisDone=true;renderEx2()">→ Выбрать перевод</button></div></div></div>`; }
 
 function renderEx3(){
   const d=ex3Q[ex3i];
