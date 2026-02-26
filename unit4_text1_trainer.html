@@ -610,6 +610,7 @@ function retryEx(n){exAnswered=false;exHints=0;
 }
 
 function renderEx1(){
+  exAnswered=false;
   const d=ex1Q[ex1i];
   if(ex1R>1 && !ex1AnalysisDone && d.analysis){ showEx1Analysis(d); return; }
   ex1AnalysisDone=false;
@@ -620,6 +621,7 @@ function renderEx1(){
 function pickOpt1(btn,se,ce){ if(exAnswered) return; exAnswered=true; const s=decodeURIComponent(se),c=decodeURIComponent(ce); document.querySelectorAll('.opt').forEach(b=>{b.style.pointerEvents='none'; if(b.textContent===c)b.classList.add('ok');}); if(s===c){btn.classList.add('ok');ex1s++;}else{btn.classList.add('bad');ex1W.push(ex1Q[ex1i]);} setTimeout(()=>{ex1i++;exAnswered=false;if(ex1i<ex1Q.length)renderEx1();else showExDone(1,ex1s,ex1Q.length,ex1W);},1400); }
 
 function renderEx2(){
+  exAnswered=false;
   const d=ex2Q[ex2i];
   if(ex2R>1 && !ex2AnalysisDone && d.tip){ showEx2Hint(d); return; }
   ex2AnalysisDone=false;
@@ -635,8 +637,8 @@ function showEx1Analysis(d){
   const kwOpts=shuffle([...a.kwOpts]);
   app.innerHTML=`<div class="screen"><div class="round-badge">🔍 Разберём вопрос (Раунд ${ex1R})</div><div class="qcard"><div class="qtext">${escH(d.q)}</div><div id="ast1"><div class="analysis-q">❓ Что спрашивает этот вопрос?</div><div class="opts">${qtOpts.map(o=>`<button class="opt opt-sm" onclick="pickAType(this,'${encodeURIComponent(o)}','${encodeURIComponent(a.qtype)}')">${escH(o)}</button>`).join('')}</div></div><div id="ast2" class="hidden"><div class="analysis-q">🔑 Какое ключевое слово поможет найти ответ в тексте?</div><div class="opts">${kwOpts.map(w=>`<button class="opt opt-sm" onclick="pickAKw(this,'${encodeURIComponent(w)}','${encodeURIComponent(a.kw)}')">${escH(w)}</button>`).join('')}</div></div><div id="ast3" class="hidden"><div class="analysis-hint">💡 ${escH(a.tip)}</div><div class="btn-row"><button class="big-btn" onclick="ex1AnalysisDone=true;renderEx1()">→ Ответить на вопрос</button></div></div></div></div>`;
 }
-function pickAType(btn,se,ce){ const s=decodeURIComponent(se),c=decodeURIComponent(ce); document.querySelectorAll('#ast1 .opt').forEach(b=>{b.style.pointerEvents='none'; if(b.textContent===c)b.classList.add('ok');}); if(s===c)btn.classList.add('ok'); else btn.classList.add('bad'); setTimeout(()=>document.getElementById('ast2').classList.remove('hidden'),900); }
-function pickAKw(btn,se,ce){ const s=decodeURIComponent(se),c=decodeURIComponent(ce); document.querySelectorAll('#ast2 .opt').forEach(b=>{b.style.pointerEvents='none'; if(b.textContent===c)b.classList.add('ok');}); if(s===c)btn.classList.add('ok'); else btn.classList.add('bad'); setTimeout(()=>document.getElementById('ast3').classList.remove('hidden'),900); }
+function pickAType(btn,se,ce){ const s=decodeURIComponent(se),c=decodeURIComponent(ce); document.querySelectorAll('#ast1 .opt').forEach(b=>{b.style.pointerEvents='none'; if(b.textContent===c)b.classList.add('ok');}); if(s===c)btn.classList.add('ok'); else btn.classList.add('bad'); setTimeout(()=>{ const el=document.getElementById('ast2'); if(el)el.classList.remove('hidden'); },900); }
+function pickAKw(btn,se,ce){ const s=decodeURIComponent(se),c=decodeURIComponent(ce); document.querySelectorAll('#ast2 .opt').forEach(b=>{b.style.pointerEvents='none'; if(b.textContent===c)b.classList.add('ok');}); if(s===c)btn.classList.add('ok'); else btn.classList.add('bad'); setTimeout(()=>{ const el=document.getElementById('ast3'); if(el)el.classList.remove('hidden'); },900); }
 function showEx2Hint(d){ app.innerHTML=`<div class="screen"><div class="round-badge">💡 Разберём термин (Раунд ${ex2R})</div><div class="qcard"><div class="qword">${escH(d.en)}</div><button class="speak-btn" onclick="speak(${JSON.stringify(d.en)})">🔊 Прослушать</button><div class="analysis-hint">${escH(d.tip)}</div><div class="btn-row"><button class="big-btn" onclick="ex2AnalysisDone=true;renderEx2()">→ Выбрать перевод</button></div></div></div>`; }
 
 function renderEx3(){
