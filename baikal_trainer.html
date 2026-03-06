@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Text Trainer - State University</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+    min-height: 100vh;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  h1 { margin: 15px 0 3px; font-size: 1.5em; text-shadow: 0 0 20px rgba(167,139,250,0.5); }
+  .subtitle { color: #a78bfa; margin-bottom: 15px; font-size: 0.95em; }
+
+  .setup {
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 20px;
+    padding: 25px 30px;
+    width: 700px; max-width: 92vw;
+    text-align: center;
+  }
+  .setup-label { color: #94a3b8; font-size: 0.95em; margin-bottom: 10px; }
+  .setup-row { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-bottom: 18px; }
+  .setup-btn {
+    padding: 10px 18px;
+    border: 2px solid rgba(255,255,255,0.2);
+    background: rgba(255,255,255,0.05);
+    color: #e2e8f0;
+    border-radius: 12px;
+    font-size: 0.95em;
+    cursor: pointer;
+    transition: all 0.25s;
+  }
+  .setup-btn:hover { border-color: #a78bfa; background: rgba(167,139,250,0.15); }
+  .setup-btn.selected { border-color: #a78bfa; background: #a78bfa; color: #0f0c29; font-weight: 600; }
+
+  .start-btn {
+    padding: 14px 45px;
+    border: none;
+    background: linear-gradient(135deg, #a78bfa, #60a5fa);
+    color: #0f0c29;
+    border-radius: 25px;
+    font-size: 1.2em;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+  .start-btn:hover { transform: scale(1.05); }
+
+  .card {
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 20px;
+    padding: 25px 30px;
+    width: 700px; max-width: 92vw;
+    text-align: left;
+    line-height: 1.8;
+    font-size: 1.05em;
+  }
+  .card-title {
+    text-align: center;
+    font-size: 0.85em;
+    color: #94a3b8;
+    margin-bottom: 12px;
+  }
+  .text-area { min-height: 200px; }
+
+  /* Blanks mode */
+  .blank {
+    display: inline-block;
+    min-width: 80px;
+    border-bottom: 2px dashed #a78bfa;
+    padding: 2px 4px;
+    margin: 0 2px;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-align: center;
+    color: transparent;
+    border-radius: 4px;
+  }
+  .blank:hover { background: rgba(167,139,250,0.15); }
+  .blank.active-blank { background: rgba(167,139,250,0.25); border-bottom-color: #fbbf24; }
+  .blank.revealed {
+    color: #4ade80;
+    border-bottom-color: #4ade80;
+    background: rgba(74,222,128,0.1);
+    cursor: default;
+  }
+  .blank.wrong {
+    color: #f87171;
+    border-bottom-color: #f87171;
+    background: rgba(248,113,113,0.1);
+  }
+
+  .blank input {
+    background: transparent; border: none; color: #fbbf24;
+    font-size: inherit; font-family: inherit; outline: none;
+    text-align: center; padding: 0; width: 100%;
+  }
+  .blank input::placeholder { color: rgba(251,191,36,0.4); }
+  .blank-actions {
+    display: inline-flex; gap: 3px; margin-left: 2px; vertical-align: baseline;
+  }
+  .blank-actions button {
+    padding: 1px 7px; font-size: 0.7em; border-radius: 5px;
+    cursor: pointer; border: none; vertical-align: baseline;
+  }
+  .blank-ok { background: #a78bfa; color: #0f0c29; font-weight: 600; }
+  .blank-skip { background: rgba(255,255,255,0.15); color: #94a3b8; }
+
+  /* First letters mode */
+  .hint-word {
+    color: #60a5fa;
+    font-weight: 600;
+  }
+  .hidden-part {
+    color: transparent;
+    background: rgba(255,255,255,0.1);
+    border-radius: 3px;
+    padding: 0 2px;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  .hidden-part.shown {
+    color: #4ade80;
+    background: transparent;
+  }
+
+  /* Input mode */
+  .write-area {
+    width: 100%;
+    min-height: 200px;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 12px;
+    color: #fff;
+    font-size: 1em;
+    font-family: inherit;
+    line-height: 1.8;
+    padding: 15px;
+    resize: vertical;
+  }
+  .write-area:focus { outline: none; border-color: #a78bfa; }
+
+  /* Comparison */
+  .compare { margin-top: 15px; line-height: 1.8; }
+  .match { color: #4ade80; }
+  .miss { color: #f87171; text-decoration: underline; }
+
+  /* Buttons row */
+  .btn-row { display: flex; gap: 10px; justify-content: center; margin-top: 15px; flex-wrap: wrap; }
+  .btn {
+    padding: 10px 25px;
+    border: none;
+    background: linear-gradient(135deg, #a78bfa, #60a5fa);
+    color: #0f0c29;
+    border-radius: 20px;
+    font-size: 1em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+  .btn:hover { transform: scale(1.05); }
+  .btn-outline {
+    background: transparent;
+    border: 2px solid #a78bfa;
+    color: #a78bfa;
+  }
+
+  .score-bar {
+    text-align: center;
+    margin-bottom: 10px;
+    font-size: 0.9em;
+    color: #94a3b8;
+  }
+  .score-bar b { color: #4ade80; }
+
+  .hidden { display: none; }
+</style>
+</head>
+<body>
+
+<h1>Text Trainer</h1>
+<p class="subtitle">State University of Land Use Planning</p>
+
+<!-- SETUP -->
+<div class="setup" id="setupScreen">
+  <div class="setup-label">Выбери режим тренировки:</div>
+  <div class="setup-row" id="modeRow">
+    <button class="setup-btn selected" onclick="pickMode(this,'read')">1. Прочитать</button>
+    <button class="setup-btn" onclick="pickMode(this,'blanks25')">2. Пропуски (лёгкий)</button>
+    <button class="setup-btn" onclick="pickMode(this,'blanks50')">3. Пропуски (средний)</button>
+    <button class="setup-btn" onclick="pickMode(this,'first')">4. Первые буквы</button>
+    <button class="setup-btn" onclick="pickMode(this,'write')">5. Написать по памяти</button>
+  </div>
+  <div style="color:#64748b;font-size:0.85em;margin-bottom:15px">
+    Проходи по порядку: сначала прочитай, потом пропуски, потом первые буквы, потом по памяти
+  </div>
+  <button class="start-btn" onclick="startMode()">СТАРТ</button>
+</div>
+
+<!-- MAIN AREA -->
+<div class="card hidden" id="mainCard">
+  <div class="card-title" id="modeTitle"></div>
+  <div class="score-bar hidden" id="scoreBar"></div>
+  <div class="text-area" id="textArea"></div>
+  <div class="btn-row" id="btnRow"></div>
+</div>
+
+<script>
+const TEXT = "The State University of Land Use Planning is one of the oldest universities in Russia. It was founded in 1779, when the first land use planning school was established in Russia. In 1935, the Land Use Planning Institute was organized on its basis. In 1992, the institute was transformed into the State University of Land Use Planning. There are 7 faculties at the University: Faculty of Architecture, Faculty of Biological Economics and Information Technology, Faculty of Land Use and Management, Faculty of Geomatics and Spatial Development, Faculty of Law, Pre-University Training Faculty, and the Institute of Part-Time Studies. The University also includes departments of advanced professional training, evening and second higher education, and distance learning. The University has a computer center, a scientific library, a publishing and printing center, numerous lecture halls, a sports hall, and a canteen. The University is located in the center of Moscow near the Kurskaya metro station. About 4,000 students study at the University. More than 250 teachers work at the University, including professors and doctors of sciences, candidates of sciences, and associate professors. University scientists carry out a wide range of research in ecological, economic, legal, and technical fields related to land ownership and land use. The University is a leading scientific and methodological center of higher education in Russia in the field of land use planning and land cadastre. The University maintains long-standing international cooperation with higher education institutions in China, Sweden, Bulgaria, and other countries.";
+
+const SENTENCES = TEXT.match(/[^.!?]+[.!?]+/g).map(s => s.trim());
+const WORDS = TEXT.split(/\s+/);
+
+let chosenMode = 'read';
+let revealedCount = 0;
+let totalBlanks = 0;
+
+function pickMode(btn, mode) {
+  chosenMode = mode;
+  document.querySelectorAll('#modeRow .setup-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+}
+
+function goSetup() {
+  document.getElementById('setupScreen').classList.remove('hidden');
+  document.getElementById('mainCard').classList.add('hidden');
+}
+
+function startMode() {
+  document.getElementById('setupScreen').classList.add('hidden');
+  document.getElementById('mainCard').classList.remove('hidden');
+  const ta = document.getElementById('textArea');
+  const br = document.getElementById('btnRow');
+  const sb = document.getElementById('scoreBar');
+  const mt = document.getElementById('modeTitle');
+  ta.innerHTML = '';
+  br.innerHTML = '';
+  sb.classList.add('hidden');
+  revealedCount = 0;
+  totalBlanks = 0;
+
+  if (chosenMode === 'read') {
+    mt.textContent = 'Режим 1: Прочитай внимательно и запомни';
+    ta.innerHTML = highlightSentences(TEXT);
+    br.innerHTML = '<button class="btn" onclick="goSetup()">Назад</button>';
+  }
+  else if (chosenMode === 'blanks25' || chosenMode === 'blanks50') {
+    const pct = chosenMode === 'blanks25' ? 0.25 : 0.5;
+    mt.textContent = chosenMode === 'blanks25' ? 'Режим 2: Пропуски (лёгкий — 25% слов скрыто)' : 'Режим 3: Пропуски (средний — 50% слов скрыто)';
+    renderBlanks(pct);
+    sb.classList.remove('hidden');
+    updateScore();
+    br.innerHTML = '<button class="btn" onclick="revealAll()">Показать все</button><button class="btn btn-outline" onclick="startMode()">Заново</button><button class="btn btn-outline" onclick="goSetup()">Назад</button>';
+  }
+  else if (chosenMode === 'first') {
+    mt.textContent = 'Режим 4: Только первые буквы — вспомни слова';
+    renderFirstLetters();
+    br.innerHTML = '<button class="btn" onclick="revealAllFirst()">Показать все</button><button class="btn btn-outline" onclick="startMode()">Заново</button><button class="btn btn-outline" onclick="goSetup()">Назад</button>';
+  }
+  else if (chosenMode === 'write') {
+    mt.textContent = 'Режим 5: Напиши текст по памяти';
+    ta.innerHTML = '<textarea class="write-area" id="writeInput" placeholder="Начни печатать текст по памяти..."></textarea>';
+    br.innerHTML = '<button class="btn" onclick="checkWritten()">Проверить</button><button class="btn btn-outline" onclick="goSetup()">Назад</button>';
+  }
+}
+
+function highlightSentences(text) {
+  const colors = ['#e2e8f0','#a78bfa','#60a5fa','#4ade80','#fbbf24','#f87171','#e2e8f0','#a78bfa','#60a5fa','#4ade80','#fbbf24','#f87171','#e2e8f0','#a78bfa'];
+  let html = '';
+  SENTENCES.forEach((s, i) => {
+    html += '<span style="color:' + colors[i % colors.length] + '">' + s + '</span> ';
+  });
+  return html;
+}
+
+// BLANKS MODE
+function renderBlanks(pct) {
+  const ta = document.getElementById('textArea');
+  let html = '';
+  const indices = new Set();
+  // Pick random word indices to hide
+  while (indices.size < Math.floor(WORDS.length * pct)) {
+    indices.add(Math.floor(Math.random() * WORDS.length));
+  }
+  totalBlanks = indices.size;
+
+  WORDS.forEach((w, i) => {
+    if (indices.has(i)) {
+      // Separate trailing punctuation
+      const match = w.match(/^(.+?)([.,;:!?]*)$/);
+      const word = match[1];
+      const punct = match[2];
+      html += '<span class="blank" data-word="' + escHtml(word) + '" onclick="clickBlank(this)" title="Нажми, чтобы открыть">' + '_'.repeat(Math.max(word.length, 3)) + '</span>' + punct + ' ';
+    } else {
+      html += w + ' ';
+    }
+  });
+  ta.innerHTML = html;
+}
+
+let activeBlank = null;
+
+function clickBlank(el) {
+  if (el.classList.contains('revealed')) return;
+  if (activeBlank && activeBlank !== el) {
+    activeBlank.classList.remove('active-blank');
+    const prev = activeBlank.querySelector('input');
+    if (prev) activeBlank.innerHTML = '_'.repeat(Math.max(activeBlank.dataset.word.length,3));
+  }
+  document.querySelectorAll('.blank-actions').forEach(a => a.remove());
+  activeBlank = el;
+  el.classList.add('active-blank');
+  const word = el.dataset.word;
+  el.innerHTML = '';
+  el.style.minWidth = Math.max(word.length*9, 60)+'px';
+  const inp = document.createElement('input');
+  inp.type = 'text'; inp.placeholder = '...';
+  inp.autocomplete = 'off'; inp.autocapitalize = 'off';
+  el.appendChild(inp);
+  const act = document.createElement('span');
+  act.className = 'blank-actions';
+  act.innerHTML = '<button class="blank-ok" onclick="submitBlank()">OK</button><button class="blank-skip" onclick="skipBlank()">?</button>';
+  el.after(act);
+  inp.focus();
+  el.scrollIntoView({behavior:'smooth', block:'center'});
+  inp.onkeydown = function(e) { if (e.key==='Enter') submitBlank(); };
+}
+
+function submitBlank() {
+  if (!activeBlank) return;
+  const word = activeBlank.dataset.word;
+  const inp = activeBlank.querySelector('input');
+  const val = inp ? inp.value.trim() : '';
+  if (!val) return;
+  activeBlank.textContent = word;
+  activeBlank.classList.remove('active-blank');
+  if (val.toLowerCase() === word.toLowerCase()) activeBlank.classList.add('revealed');
+  else activeBlank.classList.add('revealed','wrong');
+  document.querySelectorAll('.blank-actions').forEach(a => a.remove());
+  revealedCount++; updateScore();
+  const next = document.querySelector('.blank:not(.revealed)');
+  if (next) clickBlank(next); else activeBlank = null;
+}
+
+function skipBlank() {
+  if (!activeBlank) return;
+  activeBlank.textContent = activeBlank.dataset.word;
+  activeBlank.classList.remove('active-blank');
+  activeBlank.classList.add('revealed');
+  document.querySelectorAll('.blank-actions').forEach(a => a.remove());
+  revealedCount++; updateScore();
+  const next = document.querySelector('.blank:not(.revealed)');
+  if (next) clickBlank(next); else activeBlank = null;
+}
+
+function revealAll() {
+  document.querySelectorAll('.blank-actions').forEach(a => a.remove());
+  if (activeBlank) { activeBlank.classList.remove('active-blank'); activeBlank = null; }
+  document.querySelectorAll('.blank:not(.revealed)').forEach(el => {
+    el.textContent = el.dataset.word;
+    el.classList.add('revealed');
+    revealedCount++;
+  });
+  updateScore();
+}
+
+function updateScore() {
+  const correct = document.querySelectorAll('.blank.revealed:not(.wrong)').length;
+  const wrong = document.querySelectorAll('.blank.wrong').length;
+  const left = totalBlanks - revealedCount;
+  document.getElementById('scoreBar').innerHTML =
+    'Правильно: <b>' + correct + '</b> | Ошибки: <span style="color:#f87171">' + wrong + '</span> | Осталось: ' + left;
+}
+
+// FIRST LETTERS MODE
+function renderFirstLetters() {
+  const ta = document.getElementById('textArea');
+  let html = '';
+  WORDS.forEach((w, i) => {
+    const match = w.match(/^(.+?)([.,;:!?]*)$/);
+    const word = match[1];
+    const punct = match[2];
+    if (word.length <= 2 || /^\d+$/.test(word)) {
+      html += w + ' ';
+    } else {
+      const first = word[0];
+      const rest = word.slice(1);
+      html += '<span class="hint-word">' + first + '</span><span class="hidden-part" onclick="this.classList.add(\'shown\')">' + rest + '</span>' + punct + ' ';
+    }
+  });
+  ta.innerHTML = html;
+}
+
+function revealAllFirst() {
+  document.querySelectorAll('.hidden-part').forEach(el => el.classList.add('shown'));
+}
+
+// WRITE MODE
+function checkWritten() {
+  const input = document.getElementById('writeInput').value.trim();
+  if (!input) { alert('Напиши хотя бы часть текста!'); return; }
+
+  const origWords = TEXT.split(/\s+/);
+  const userWords = input.split(/\s+/);
+  const ta = document.getElementById('textArea');
+
+  let html = '<div style="margin-bottom:15px;text-align:center;color:#94a3b8">Сравнение с оригиналом (зелёное — правильно, красное — ошибки):</div><div class="compare">';
+  let correct = 0;
+
+  const maxLen = Math.max(origWords.length, userWords.length);
+  for (let i = 0; i < origWords.length; i++) {
+    const ow = origWords[i];
+    const uw = userWords[i] || '';
+    const clean = (s) => s.replace(/[.,;:!?]/g, '').toLowerCase();
+    if (clean(uw) === clean(ow)) {
+      html += '<span class="match">' + ow + '</span> ';
+      correct++;
+    } else {
+      html += '<span class="miss" title="ты написал: ' + escHtml(uw || '—') + '">' + ow + '</span> ';
+    }
+  }
+  html += '</div>';
+
+  const pct = Math.round(correct / origWords.length * 100);
+  html += '<div style="text-align:center;margin-top:15px;font-size:1.2em">Результат: <b style="color:#a78bfa">' + pct + '%</b> (' + correct + ' из ' + origWords.length + ' слов)</div>';
+
+  ta.innerHTML = html;
+  document.getElementById('btnRow').innerHTML = '<button class="btn" onclick="startMode()">Ещё раз</button><button class="btn btn-outline" onclick="goSetup()">Назад</button>';
+}
+
+function escHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+</script>
+</body>
+</html>
